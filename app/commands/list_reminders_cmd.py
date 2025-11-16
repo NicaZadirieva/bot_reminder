@@ -1,1 +1,1 @@
-# Список напоминаний
+# Get all list of reminders

@@ -1,1 +1,1 @@
- # Бизнес-логика
+ # Business logics

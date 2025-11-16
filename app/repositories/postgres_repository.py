@@ -1,1 +1,1 @@
-# PostgreSQL реализация
+# PostgreSQL impl

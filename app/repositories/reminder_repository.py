@@ -1,1 +1,1 @@
-# Репозиторий напоминаний
+# Reminder-specific repository

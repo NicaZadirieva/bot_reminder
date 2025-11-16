@@ -1,1 +1,1 @@
-# Обработчики команд
+# Handlers for reminder

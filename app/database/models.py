@@ -1,1 +1,1 @@
-# SQLAlchemy модели
+# SQLAlchemy models

@@ -1,1 +1,1 @@
-# Отмена напоминания
+# Cancel and not remind command

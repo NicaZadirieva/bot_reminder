@@ -1,2 +1,2 @@
-# Другие обработчики
-# TODO: удалить если не понадобится
+# Others
+# TODO: delete if not need

@@ -1,1 +1,1 @@
-# Парсер входных данных
+# Parser income data

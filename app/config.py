@@ -1,1 +1,1 @@
-# Конфигурация
+# Configuration
