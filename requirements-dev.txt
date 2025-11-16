@@ -1,0 +1,35 @@
+# requirements.txt - Зависимости для Telegram Reminder Bot
+
+# Core
+aiogram==3.1.0              # Telegram Bot Framework
+asyncpg==0.27.0             # PostgreSQL async driver
+aiohttp==3.8.5              # Async HTTP client
+
+# Scheduling
+apscheduler==3.10.0         # Advanced Python Scheduler
+pytz==2023.3.post1          # Timezone library
+
+# Database
+sqlalchemy==2.0.23          # ORM and SQL toolkit
+alembic==1.13.0             # Database migration tool
+
+# Environment
+python-dotenv==1.0.0        # Load environment variables
+
+# Logging
+loguru==0.7.2               # Logging library
+
+# Validation
+pydantic==2.5.0             # Data validation using Python type annotations
+
+# Development
+pytest==7.4.3               # Testing framework
+pytest-asyncio==0.21.1      # Pytest plugin for asyncio
+pytest-cov==4.1.0           # Coverage plugin for pytest
+black==23.12.0              # Code formatter
+flake8==6.1.0               # Style guide enforcement
+mypy==1.7.1                 # Static type checker
+
+# Production
+gunicorn==21.2.0            # WSGI HTTP Server
+python-multipart==0.0.6     # Multipart parsing
