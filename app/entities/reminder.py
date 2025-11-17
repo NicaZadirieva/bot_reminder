@@ -11,6 +11,7 @@ class Priority(Enum):
 class ReminderStatus(Enum):
     ACTIVE = "active"
     COMPLETED = "completed"
+    CANCELLED = "cancelled"
 
 @dataclass
 class Reminder:

@@ -1,17 +1,9 @@
-﻿from app.entities.reminder import Reminder, Priority
-from datetime import datetime, timedelta
+﻿import asyncio
+from app.database.connection import init_db, async_session
+from app.database.models import User, Reminder
 
-reminder = Reminder(
-    telegram_id=123456789,
-    text="Купить молоко",
-    remind_at=datetime.now() + timedelta(hours=2),
-    priority=Priority.HIGH
-)
+async def main():
+    await init_db()
+    print("✅ БД инициализирована!")
 
-print(reminder)
-# Reminder(telegram_id=123456789, text='Купить молоко', ...)
-
-print(f"Активное: {reminder.is_active()}")  # True
-
-reminder.mark_completed()
-print(f"Статус: {reminder.status}")  # ReminderStatus.COMPLETED
+asyncio.run(main())
