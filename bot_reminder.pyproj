@@ -39,6 +39,7 @@
     <Compile Include="app\repositories\base.py" />
     <Compile Include="app\repositories\postgres_repository.py" />
     <Compile Include="app\repositories\reminder_repository.py" />
+    <Compile Include="app\repositories\user_repository.py" />
     <Compile Include="app\schedulers\reminder_scheduler.py" />
     <Compile Include="app\services\reminder_service.py" />
     <Compile Include="app\tests\test_parser.py" />
