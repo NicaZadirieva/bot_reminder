@@ -21,6 +21,7 @@
   <ItemGroup>
     <Content Include=".env" />
     <Content Include=".env.example" />
+    <Content Include="pytest.ini" />
     <Content Include="requirements-dev.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -37,13 +38,21 @@
     <Compile Include="app\handlers\reminder_handlers.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
     <Compile Include="app\repositories\base.py" />
+    <Compile Include="app\repositories\fake_repository.py" />
+    <Compile Include="app\repositories\fake_reminder_repository.py" />
+    <Compile Include="app\repositories\fake_user_repository.py" />
     <Compile Include="app\repositories\postgres_repository.py" />
     <Compile Include="app\repositories\reminder_repository.py" />
+    <Compile Include="app\repositories\user_repository.py" />
+    <Compile Include="app\repositories\__init__.py" />
     <Compile Include="app\schedulers\reminder_scheduler.py" />
     <Compile Include="app\services\reminder_service.py" />
     <Compile Include="app\tests\test_parser.py" />
-    <Compile Include="app\tests\test_repositories.py" />
+    <Compile Include="app\tests\test_reminder_repository.py" />
+    <Compile Include="app\tests\test_user_repositories.py" />
     <Compile Include="app\tests\test_service.py" />
+    <Compile Include="app\tests\__init__.py" />
+    <Compile Include="app\__init__.py" />
     <Compile Include="main.py" />
   </ItemGroup>
   <ItemGroup>
