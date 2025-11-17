@@ -12,6 +12,7 @@
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -21,14 +22,21 @@
   <ItemGroup>
     <Content Include=".env" />
     <Content Include=".env.example" />
+    <Content Include="alembic.ini" />
+    <Content Include="alembic\README" />
+    <Content Include="alembic\script.py.mako" />
     <Content Include="pytest.ini" />
     <Content Include="requirements-dev.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="alembic\env.py" />
     <Compile Include="app\commands\base.py" />
     <Compile Include="app\commands\cancel_reminder_cmd.py" />
     <Compile Include="app\commands\create_reminder_cmd.py" />
+    <Compile Include="app\commands\fake_message.py" />
+    <Compile Include="app\commands\help_cmd.py" />
     <Compile Include="app\commands\list_reminders_cmd.py" />
+    <Compile Include="app\commands\start_cmd.py" />
     <Compile Include="app\config.py" />
     <Compile Include="app\database\connection.py" />
     <Compile Include="app\database\models.py" />
@@ -56,6 +64,8 @@
     <Compile Include="main.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="alembic\" />
+    <Folder Include="alembic\versions\" />
     <Folder Include="app" />
     <Folder Include="app\commands" />
     <Folder Include="app\database" />

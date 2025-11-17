@@ -1,5 +1,8 @@
 ﻿import asyncio
 
+from app.commands.fake_message import FakeMessage
+from app.commands.help_cmd import HelpCommand
+from app.commands.start_cmd import StartCommand
 from app.database.models import Reminder
 from app.repositories.reminder_repository import ReminderRepository
 from app.database.connection import async_session
@@ -9,15 +12,9 @@ reminder_repo = ReminderRepository()
 
 
 async def main():
-    async with async_session() as session:
-        reminder = await reminder_repo.create(session, Reminder(text = "Напоминание", remind_at=datetime.now() + timedelta(hours=2), telegram_id=12345))
-
-        reminder = await reminder_repo.get_by_id(session, 1)
-    
-        reminder = await reminder_repo.get_all(session)
-
-        reminder = await reminder_repo.update(session, 1, text="Другое напоминание")
-
-        #await user_repo.delete(session, 1)
+    helpCmd = HelpCommand()
+    await helpCmd.execute(FakeMessage())
+    startCmd = StartCommand()
+    await startCmd.execute(FakeMessage())
 
 asyncio.run(main())
