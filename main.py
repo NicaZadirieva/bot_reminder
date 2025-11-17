@@ -1,3 +1,9 @@
-﻿from app.config import config
+﻿import asyncio
+from app.database.connection import init_db, async_session
+from app.database.models import User, Reminder
 
-print(config.BOT_TOKEN);
+async def main():
+    await init_db()
+    print("✅ БД инициализирована!")
+
+asyncio.run(main())
