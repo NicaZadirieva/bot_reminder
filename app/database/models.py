@@ -15,6 +15,12 @@ class Status(PyEnum):
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
+class RepeatedValue(PyEnum):
+    ONCE = "once"
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+
 class User(Base):
     __tablename__ = "users"
     
@@ -35,5 +41,6 @@ class Reminder(Base):
     priority = Column(Enum(Priority), default=Priority.MEDIUM)
     status = Column(Enum(Status), default=Status.ACTIVE)
     created_at = Column(DateTime, default=datetime.now)
+    repeated_value = Column(Enum(RepeatedValue, name='repeated_value_enum'), default=RepeatedValue.ONCE, nullable=True)
     
     user = relationship("User", back_populates="reminders")
