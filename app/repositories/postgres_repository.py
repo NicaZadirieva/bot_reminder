@@ -24,11 +24,13 @@ class PostgresRepository(IRepository):
     
     async def update(self, session, id: int, **kwargs):
         obj = await session.get(self.model, id)
-        for key, value in kwargs.items():
-            setattr(obj, key, value)
-        await session.commit()
-        await session.refresh(obj)
-        return obj
+        if obj:
+            for key, value in kwargs.items():
+                setattr(obj, key, value)
+            await session.commit()
+            await session.refresh(obj)
+            return obj
+        return None
     
     async def delete(self, session, id: int):
         obj = await session.get(self.model, id)
