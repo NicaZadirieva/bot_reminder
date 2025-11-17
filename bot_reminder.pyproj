@@ -19,6 +19,8 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".env" />
+    <Content Include=".env.example" />
     <Content Include="requirements-dev.txt" />
   </ItemGroup>
   <ItemGroup>
