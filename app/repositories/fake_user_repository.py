@@ -38,7 +38,7 @@ class FakeUserRepository(IFakeRepository):
         for user in self.storage:
             if (user["id"] == id):
                 for key, value in kwargs.items():
-                    setattr(user, key, value)
+                    user[key] = value 
                 return user
         return None
 
