@@ -23,4 +23,5 @@ class ListRemindersCommand(BotCommand):
 
     async def execute(self, message: types.Message):
         reminders = await self.repo.get_all(self.session)
+        reminders = [r for r in reminders if r.telegram_id == message.from_user.id]
         await self.printAllReminders(reminders, message)
