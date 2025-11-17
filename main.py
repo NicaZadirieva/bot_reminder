@@ -1,21 +1,22 @@
 ﻿import asyncio
 
-from app.database.models import User
-from app.repositories.user_repository import UserRepository
+from app.database.models import Reminder
+from app.repositories.reminder_repository import ReminderRepository
 from app.database.connection import async_session
+from datetime import datetime, timedelta
 
-user_repo = UserRepository()
+reminder_repo = ReminderRepository()
 
 
 async def main():
     async with async_session() as session:
-        #user = await user_repo.create(session, User(username="John", telegram_id=12345))
+        reminder = await reminder_repo.create(session, Reminder(text = "Напоминание", remind_at=datetime.now() + timedelta(hours=2), telegram_id=12345))
 
-        user = await user_repo.get_by_id(session, 2)
+        reminder = await reminder_repo.get_by_id(session, 1)
     
-        users = await user_repo.get_all(session)
+        reminder = await reminder_repo.get_all(session)
 
-        user = await user_repo.update(session, 2, username="Jane")
+        reminder = await reminder_repo.update(session, 1, text="Другое напоминание")
 
         #await user_repo.delete(session, 1)
 
