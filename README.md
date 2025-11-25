@@ -250,9 +250,8 @@ telegram-reminder-bot/
 │   │   ├── create_reminder_cmd.py   # Создание напоминания
 │   │   ├── list_reminders_cmd.py    # Список напоминаний
 │   │   └── cancel_reminder_cmd.py   # Отмена напоминания
-│   ├── handlers/
-│   │   ├── reminder_handlers.py     # Обработчики команд
-│   │   └── message_handlers.py      # Другие обработчики
+│   ├── dispatchers/
+│   │   ├── reminder_dispatcher.py     # Обработчики команд
 │   ├── schedulers/
 │   │   └── reminder_scheduler.py    # APScheduler
 │   ├── parsers/
