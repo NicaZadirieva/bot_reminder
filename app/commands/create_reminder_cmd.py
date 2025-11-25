@@ -1,4 +1,4 @@
-# Create remind
+п»ї# Create remind
 from .base import BotCommand
 from app.parsers.reminder_parser import ReminderParser
 from app.repositories.base import IRepository
@@ -13,11 +13,12 @@ class CreateReminderCommand(BotCommand):
         self.session = session
 
     async def execute(self, message: types.Message):
-        # TODO: подумать как заменить \remind, replace
+        # TODO: РїРѕРґСѓРјР°С‚СЊ РєР°Рє Р·Р°РјРµРЅРёС‚СЊ \remind, replace
         user_text = message.text.replace("\remind", "")
         try:
             reminder = self.parser.parse(user_text, message.from_user.id)
             await self.repo.create(self.sesion, reminder);
+            message.answer("вњ… РќР°РїРѕРјРёРЅР°РЅРёРµ СЃРѕР·РґР°РЅРѕ!")
         except:
-            message.answer("Формат данных не соответсвует команде")
+            message.answer("Р¤РѕСЂРјР°С‚ РґР°РЅРЅС‹С… РЅРµ СЃРѕРѕС‚РІРµС‚СЃРІСѓРµС‚ РєРѕРјР°РЅРґРµ")
 
