@@ -13,6 +13,12 @@ class ReminderStatus(Enum):
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
+class RepeatedValue(Enum):
+    ONCE = "once"
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+
 @dataclass
 class Reminder:
     telegram_id: int
@@ -23,6 +29,7 @@ class Reminder:
     priority: Priority = Priority.MEDIUM
     status: ReminderStatus = ReminderStatus.ACTIVE
     created_at: Optional[datetime] = None
+    repeated_value: RepeatedValue = RepeatedValue.ONCE
     
     def __post_init__(self):
         if self.created_at is None:

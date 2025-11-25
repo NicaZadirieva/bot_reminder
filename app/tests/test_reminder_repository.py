@@ -21,7 +21,7 @@ class TestReminderRepository:
     @pytest.mark.asyncio
     async def test_get_by_id(self, repo):
         reminder = await repo.get_by_id(None, 1)
-        assert reminder["text"] == "Buy milk"
+        assert reminder.text == "Buy milk"
     
     @pytest.mark.asyncio
     async def test_get_by_id_not_found(self, repo):
@@ -41,33 +41,33 @@ class TestReminderRepository:
             "priority": "high",
             "status": "active",
         })
-        assert new["id"] == 10
+        assert new.id == 10
     
     @pytest.mark.asyncio
     async def test_create_auto_increments(self, repo):
         r1 = await repo.create(None, {"telegram_id": 1, "text": "1", "remind_at": datetime.now(), "priority": "high", "status": "active"})
         r2 = await repo.create(None, {"telegram_id": 2, "text": "2", "remind_at": datetime.now(), "priority": "high", "status": "active"})
         
-        assert r1["id"] == 10
-        assert r2["id"] == 11
+        assert r1.id == 10
+        assert r2.id == 11
     
     # ============ UPDATE TESTS (5) ============
     
     @pytest.mark.asyncio
     async def test_update_status(self, repo):
         updated = await repo.update(None, 1, status="completed")
-        assert updated["status"] == "completed"
+        assert updated.status == "completed"
     
     @pytest.mark.asyncio
     async def test_update_text(self, repo):
         updated = await repo.update(None, 1, text="New text")
-        assert updated["text"] == "New text"
+        assert updated.text == "New text"
     
     @pytest.mark.asyncio
     async def test_update_multiple_fields(self, repo):
         updated = await repo.update(None, 1, status="done", priority="low")
-        assert updated["status"] == "done"
-        assert updated["priority"] == "low"
+        assert updated.status == "done"
+        assert updated.priority == "low"
     
     @pytest.mark.asyncio
     async def test_update_not_found(self, repo):
