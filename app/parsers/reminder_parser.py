@@ -72,7 +72,7 @@ class ReminderParser:
         if time.startswith("через "):
             time_part = time.replace("через", "").strip()
             
-            match = re.match(r"^(\d+)\s*(часа?|часов|минут?|дня?|дней|неделя?|недель)$", time_part)
+            match = re.match(r"^(\d+)\s*(час|часа|часов|минут|минута|минуты|день|дня|дней|неделя|недели|недель)$",time_part)
             
             if match:
                 count = int(match.group(1))
@@ -120,7 +120,13 @@ class ReminderParser:
         match (len(reminderParams)):
             case 2:
                 desc = self.parseReminderDescription(reminderParams[0])
+                if not desc:
+                    raise ValueError(f"Invalid desc format: '{reminderParams[0]}'")
+
                 time = self.parseReminderTime(reminderParams[1])
+
+                if not time:
+                    raise ValueError(f"Invalid time format: '{reminderParams[1]}'")
 
                 return Reminder(
                     telegram_id=telegram_id,
@@ -134,8 +140,16 @@ class ReminderParser:
                 desc = self.parseReminderDescription(reminderParams[0])
                 time = self.parseReminderTime(reminderParams[1])
                 priority = self.parseReminderPriority(reminderParams[2])
+                if not desc:
+                    raise ValueError(f"Invalid desc format: '{reminderParams[0]}'")
+
+                if not time:
+                    raise ValueError(f"Invalid time format: '{reminderParams[1]}'")
+
                 if priority is None:
                     frequency = self.parseReminderFrequency(reminderParams[2])
+                    if not frequency:
+                        raise ValueError(f"Invalid frequency: '{reminderParams[2]}'")
                     return Reminder(
                         telegram_id=telegram_id,
                         text=desc,
@@ -158,6 +172,16 @@ class ReminderParser:
                 time = self.parseReminderTime(reminderParams[1])
                 priority = self.parseReminderPriority(reminderParams[2])
                 frequency = self.parseReminderFrequency(reminderParams[3])
+
+                if not desc:
+                    raise ValueError(f"Invalid desc format: '{reminderParams[0]}'")
+                if not time:
+                    raise ValueError(f"Invalid time format: '{reminderParams[1]}'")
+                if not priority:
+                    raise ValueError(f"Invalid priority: '{reminderParams[2]}'")
+                if not frequency:
+                    raise ValueError(f"Invalid frequency: '{reminderParams[3]}'")
+
                 return Reminder(
                         telegram_id=telegram_id,
                         text=desc,
