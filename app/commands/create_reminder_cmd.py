@@ -13,6 +13,7 @@ class CreateReminderCommand(BotCommand):
         self.session = session
 
     async def execute(self, message: types.Message):
+        # TODO: подумать как заменить \remind, replace
         user_text = message.text.replace("\remind", "")
         try:
             reminder = self.parser.parse(user_text, message.from_user.id)
