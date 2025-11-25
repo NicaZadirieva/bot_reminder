@@ -42,7 +42,6 @@
     <Compile Include="app\database\models.py" />
     <Compile Include="app\di_container.py" />
     <Compile Include="app\entities\reminder.py" />
-    <Compile Include="app\handlers\message_handlers.py" />
     <Compile Include="app\handlers\reminder_handlers.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
     <Compile Include="app\repositories\base.py" />

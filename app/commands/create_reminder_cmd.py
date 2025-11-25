@@ -6,9 +6,9 @@ from aiogram import types
 from typing import Optional, List, Any
 
 class CreateReminderCommand(BotCommand):
-    def __init__(self, repo: IRepository, session: Any):
+    def __init__(self, repo: IRepository, session: Any, parser: ReminderParser):
         super().__init__()
-        self.parser = ReminderParser()
+        self.parser = parser
         self.repo = repo
         self.session = session
 
