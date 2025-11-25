@@ -42,7 +42,7 @@
     <Compile Include="app\database\models.py" />
     <Compile Include="app\di_container.py" />
     <Compile Include="app\entities\reminder.py" />
-    <Compile Include="app\handlers\reminder_handlers.py" />
+    <Compile Include="app\dispatchers\reminder_dispatcher.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
     <Compile Include="app\repositories\base.py" />
     <Compile Include="app\repositories\fake_repository.py" />
@@ -69,7 +69,7 @@
     <Folder Include="app\commands" />
     <Folder Include="app\database" />
     <Folder Include="app\entities" />
-    <Folder Include="app\handlers" />
+    <Folder Include="app\dispatchers\" />
     <Folder Include="app\parsers" />
     <Folder Include="app\repositories" />
     <Folder Include="app\schedulers" />
