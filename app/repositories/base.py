@@ -4,12 +4,17 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Generic, TypeVar
 
 T = TypeVar('T')
-
+# TODO: переименовать в IReminderRepository
 class IRepository(ABC, Generic[T]):
     """Base repo"""
     
     @abstractmethod
     async def get_by_id(self, session, id: int) -> Optional[T]:
+        pass
+
+    @abstractmethod
+    async def get_by_telegram_id(self, session, telegram_id: int) -> Optional[T]:
+        """Получить ВСЕ напоминания пользователя"""
         pass
     
     @abstractmethod
