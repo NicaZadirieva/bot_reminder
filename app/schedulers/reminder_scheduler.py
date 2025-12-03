@@ -5,14 +5,16 @@ from repositories.reminder_repository import ReminderRepository
 from typing import Optional, List, Any
 from datetime import datetime, timedelta
 from aiogram import Bot
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 # TODO: перенести логику в сервис для репо
 class ReminderScheduler:
     def __init__(self, session: Any, reminderRepo: ReminderRepository, bot: Bot):
-        self.reminderRepo = reminderRepo;
-        self.session = session;
-        self.bot = bot;
+        self.reminderRepo = reminderRepo
+        self.session = session
+        self.bot = bot
         self.reminders = dict()
+        self.scheduler = AsyncIOScheduler()
 
     async def load_reminders(self):
         """📥 Загрузить ВСЕ активные напоминания из БД"""
@@ -38,6 +40,13 @@ class ReminderScheduler:
     
         except Exception as e:
             print(f"❌ Ошибка: {e}")
+
+    async def cancel_reminder_job(self, id: int):
+        reminder = await self.reminderRepo.get_by_id(id)
+        if reminder is None:
+            raise Exception("Reminder with id = " + id + " not found")
+        else:
+            self.scheduler.remove_job(f'reminder_{reminder.id}')
 
     async def schedule_reminder(self, reminder: Reminder):
         """Запланировать одно напоминание в APScheduler"""

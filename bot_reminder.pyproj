@@ -51,6 +51,7 @@
     <Compile Include="app\repositories\reminder_repository.py" />
     <Compile Include="app\repositories\__init__.py" />
     <Compile Include="app\schedulers\reminder_scheduler.py" />
+    <Compile Include="app\schedulers\__init__.py" />
     <Compile Include="app\services\reminder_service.py" />
     <Compile Include="app\tests\test_parser.py" />
     <Compile Include="app\tests\test_reminder_repository.py" />

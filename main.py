@@ -8,12 +8,17 @@ from app.repositories.reminder_repository import ReminderRepository
 from app.database.connection import async_session
 from aiogram import Dispatcher, Bot
 
+from app.schedulers.reminder_scheduler import ReminderScheduler
+
 
 async def main():
     async with async_session() as session:
+        bot = Bot(token=config.BOT_TOKEN)
         repo = ReminderRepository()
+        remindScheduler = ReminderScheduler(session, repo, bot)
         parser = ReminderParser()
-        reminderDispatcher = ReminderDispatcher(repo, session, parser)
+        
+        reminderDispatcher = ReminderDispatcher(repo, session, parser, remindScheduler)
         router = Router()
 
         @router.message(Command([
@@ -26,7 +31,6 @@ async def main():
         async def handle_reminder_command(message: types.Message):
             await reminderDispatcher.dispatch(message)
 
-        bot = Bot(token=config.BOT_TOKEN)
         dp = Dispatcher()
         dp.include_router(router)
         await dp.start_polling(bot)
