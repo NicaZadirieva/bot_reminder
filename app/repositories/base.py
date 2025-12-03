@@ -14,7 +14,6 @@ class IRepository(ABC, Generic[T]):
 
     @abstractmethod
     async def get_by_telegram_id(self, session, telegram_id: int) -> Optional[T]:
-        """Получить ВСЕ напоминания пользователя"""
         pass
     
     @abstractmethod

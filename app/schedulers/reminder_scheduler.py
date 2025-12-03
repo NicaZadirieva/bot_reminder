@@ -1,7 +1,7 @@
 ﻿# APScheduler
 from app.database.models import Reminder, RepeatedValue
 from app.entities.reminder import ReminderStatus
-from repositories.reminder_repository import ReminderRepository
+from app.repositories.reminder_repository import ReminderRepository
 from typing import Optional, List, Any
 from datetime import datetime, timedelta
 from aiogram import Bot

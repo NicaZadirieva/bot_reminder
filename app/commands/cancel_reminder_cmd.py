@@ -2,9 +2,9 @@
 from .base import BotCommand
 from aiogram import types
 from app.repositories.base import IRepository
-from entities.reminder import ReminderStatus
+from app.entities.reminder import ReminderStatus
 from typing import Any
-from schedulers.reminder_scheduler import ReminderScheduler
+from app.schedulers.reminder_scheduler import ReminderScheduler
 
 class CancelReminderCommand(BotCommand):
     def __init__(self, repo: IRepository, session: Any, reminderScheduler: ReminderScheduler):
