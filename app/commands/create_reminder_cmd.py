@@ -16,12 +16,13 @@ class CreateReminderCommand(BotCommand):
 
     async def execute(self, message: types.Message):
         # TODO: подумать как заменить \remind, replace
-        user_text = message.text.replace("\remind", "")
+        user_text = message.text.replace("/remind", "")
         try:
             reminder = self.parser.parse(user_text, message.from_user.id)
-            await self.repo.create(self.sesion, reminder);
+            await self.repo.create(self.session, reminder);
             await self.reminderScheduler.schedule_reminder(reminder)
             await message.answer("✅ Напоминание создано!")
-        except:
+        except Exception as e:
+            print(e)
             await message.answer("Формат данных не соответсвует команде")
 

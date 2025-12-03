@@ -21,12 +21,12 @@ class ReminderDispatcher:
 
     async def remindDispatch(self, message):
         command_class = self.commands.get('/remind')
-        command = command_class(self.repo, self.session, parser=self.parser, reminderScheduler = self.reminderScheduler)
+        command = command_class(self.repo, self.session, self.parser, self.reminderScheduler)
         return await command.execute(message)
 
     async def cancelDispatch(self, message):
         command_class = self.commands.get('/cancel_reminder')
-        command = command_class(self.repo, self.session, reminderScheduler = self.reminderScheduler)
+        command = command_class(self.repo, self.session, self.reminderScheduler)
         return await command.execute(message)
 
     async def listDispatch(self, message):
