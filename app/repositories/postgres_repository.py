@@ -10,6 +10,15 @@ class PostgresRepository(IRepository):
     
     async def get_by_id(self, session, id: int):
         return await session.get(self.model, id)
+
+    async def get_by_telegram_id(self, session, telegram_id: int):
+        return await session.get(self.model, telegram_id)
+
+    
+    async def get_by_telegram_id(self, session, telegram_id: int):
+        query = select(self.model).where(self.model.telegram_id == telegram_id)
+        result = await session.execute(query)
+        return result.scalars().all()
     
     async def get_all(self, session):
         query = select(self.model)
@@ -39,3 +48,4 @@ class PostgresRepository(IRepository):
         await session.delete(obj)
         await session.commit()
         return True
+

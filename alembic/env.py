@@ -16,7 +16,7 @@ print(f"📁 Project root: {project_root}")
 print(f"🐍 Python path: {sys.path[0]}")
 
 try:
-    from app.database.models import Base, User, Reminder
+    from app.database.models import Base, Reminder
     print("✅ Models imported successfully!")
     print(f"   Base.metadata.tables: {list(Base.metadata.tables.keys())}")
 except ImportError as e:

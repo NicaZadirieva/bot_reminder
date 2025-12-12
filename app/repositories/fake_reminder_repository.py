@@ -149,3 +149,10 @@ class FakeReminderRepository(IFakeRepository):
                 self.storage.pop(i)
                 return True
         return False
+
+    async def get_by_telegram_id(self, session: Any, telegram_id: int):
+        reminders = []
+        for reminder in self.storage:
+            if reminder.telegram_id == telegram_id:
+                reminders.append(reminder)
+        return reminders

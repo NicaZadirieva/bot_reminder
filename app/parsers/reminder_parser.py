@@ -1,4 +1,4 @@
-﻿from app.entities.reminder import Reminder, Priority, RepeatedValue, ReminderStatus
+﻿from app.database.models import Reminder, Priority, RepeatedValue, Status
 from datetime import datetime, timedelta
 from typing import Optional
 import re
@@ -133,7 +133,7 @@ class ReminderParser:
                     text=desc,
                     remind_at=time,
                     priority=Priority.MEDIUM,
-                    status=ReminderStatus.ACTIVE, 
+                    status=Status.ACTIVE, 
                     repeated_value=RepeatedValue.ONCE
                 )
             case 3:
@@ -155,7 +155,7 @@ class ReminderParser:
                         text=desc,
                         remind_at=time,
                         priority=Priority.MEDIUM,
-                        status=ReminderStatus.ACTIVE, 
+                        status=Status.ACTIVE, 
                         repeated_value=frequency
                     )
                 else:
@@ -164,7 +164,7 @@ class ReminderParser:
                         text=desc,
                         remind_at=time,
                         priority=priority,
-                        status=ReminderStatus.ACTIVE, 
+                        status=Status.ACTIVE, 
                         repeated_value=RepeatedValue.ONCE
                     )
             case 4:
@@ -187,7 +187,7 @@ class ReminderParser:
                         text=desc,
                         remind_at=time,
                         priority=priority,
-                        status=ReminderStatus.ACTIVE, 
+                        status=Status.ACTIVE, 
                         repeated_value=frequency
                     )
             case _:

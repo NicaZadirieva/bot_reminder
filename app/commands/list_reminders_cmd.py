@@ -19,7 +19,10 @@ class ListRemindersCommand(BotCommand):
                 ⏰ {reminder.remind_at}
                 🔔 {reminder.status} | 🔄 ${reminder.repeated_value}
             ''')
-        await message.answer(answer_text)
+        if answer_text:
+            await message.answer(answer_text)
+        else:
+            await message.answer('Нет напоминаний')
 
     async def execute(self, message: types.Message):
         reminders = await self.repo.get_all(self.session)
