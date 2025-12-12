@@ -16,10 +16,13 @@ async def main():
         bot = Bot(token=config.BOT_TOKEN)
         repo = ReminderRepository()
         remindScheduler = ReminderScheduler(session, repo, bot)
+        await remindScheduler.load_reminders()
         parser = ReminderParser()
         
         reminderDispatcher = ReminderDispatcher(repo, session, parser, remindScheduler)
         router = Router()
+
+
 
         @router.message(Command(
             'start',
@@ -49,6 +52,21 @@ async def main():
 
         dp = Dispatcher()
         dp.include_router(router)
+        
+
+        # Регистрируем обработчики
+        async def on_startup():
+            """Вызовется при старте бота"""
+            await remindScheduler.start()
+
+        async def on_shutdown():
+            """Вызовется при остановке бота"""
+            await remindScheduler.shutdown()
+
+        dp.startup.register(on_startup)
+        dp.shutdown.register(on_shutdown)
+
         await dp.start_polling(bot)
+
 
 asyncio.run(main())

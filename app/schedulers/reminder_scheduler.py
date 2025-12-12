@@ -1,151 +1,210 @@
-﻿# APScheduler
-from app.database.models import Reminder, RepeatedValue
-from app.entities.reminder import ReminderStatus
+﻿from app.database.models import Reminder, RepeatedValue, Status
 from app.repositories.reminder_repository import ReminderRepository
 from typing import Optional, List, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone as dt_timezone
 from aiogram import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pytz import timezone
+import logging
 
-# TODO: перенести логику в сервис для репо
+logger = logging.getLogger(__name__)
+
+
 class ReminderScheduler:
     def __init__(self, session: Any, reminderRepo: ReminderRepository, bot: Bot):
         self.reminderRepo = reminderRepo
         self.session = session
         self.bot = bot
         self.reminders = dict()
-        self.scheduler = AsyncIOScheduler()
+        self.tz = timezone('Europe/Moscow')
+        self.scheduler = AsyncIOScheduler(timezone=self.tz)
+
+    async def start(self):
+        """🚀 Запустить scheduler"""
+        if not self.scheduler.running:
+            self.scheduler.start()
+            logger.info("✅ Scheduler запущен")
+            await self.load_reminders()
+
+    async def shutdown(self):
+        """⏹️ Остановить scheduler"""
+        if self.scheduler.running:
+            self.scheduler.shutdown()
+            logger.info("✅ Scheduler остановлен")
+
+    def _make_aware(self, dt: datetime) -> datetime:
+        """🔧 Конвертировать naive datetime в timezone-aware"""
+        if dt.tzinfo is None:
+            # Если datetime naive, добавить timezone Moscow
+            return self.tz.localize(dt)
+        return dt
 
     async def load_reminders(self):
         """📥 Загрузить ВСЕ активные напоминания из БД"""
-    
-        print("📥 Загружаю напоминания...")
-    
+        logger.info("📥 Загружаю напоминания...")
+        
         try:
             # 1️⃣ Получить ВСЕ напоминания
             all_reminders = await self.reminderRepo.get_all(self.session)
-        
+            
             # 2️⃣ Отфильтровать АКТИВНЫЕ
-            active = [r for r in all_reminders if r.status == "active"]
-        
-            # 3️⃣ Отфильтровать БУДУЩИЕ (не прошедшие)
-            now = datetime.now()
-            future = [r for r in active if r.remind_at > now]
-        
+            active = [r for r in all_reminders if r.status == Status.ACTIVE]
+            
+            # 3️⃣ Для ONCE - отфильтровать БУДУЩИЕ (не прошедшие)
+            now = datetime.now(self.tz)
+            to_schedule = [
+                r for r in active 
+                if r.repeated_value != RepeatedValue.ONCE or self._make_aware(r.remind_at) > now
+            ]
+            
             # 4️⃣ Запланировать каждое
-            for reminder in future:
+            for reminder in to_schedule:
                 await self.schedule_reminder(reminder)
+            
+            logger.info(f"✅ Загружено {len(to_schedule)} напоминаний")
         
-            print(f"✅ Загружено {len(future)} напоминаний")
-    
         except Exception as e:
-            print(f"❌ Ошибка: {e}")
+            logger.error(f"❌ Ошибка при загрузке напоминаний: {e}", exc_info=True)
 
     async def cancel_reminder_job(self, id: int):
-        reminder = await self.reminderRepo.get_by_id(id)
-        if reminder is None:
-            raise Exception("Reminder with id = " + id + " not found")
-        else:
-            self.scheduler.remove_job(f'reminder_{reminder.id}')
+        """❌ Отменить напоминание"""
+        try:
+            reminder = await self.reminderRepo.get_by_id(self.session, id)
+            if reminder is None:
+                raise Exception(f"Reminder with id={id} not found")
+            
+            job_id = f'reminder_{reminder.id}'
+            if self.scheduler.get_job(job_id):
+                self.scheduler.remove_job(job_id)
+                logger.info(f"✅ Напоминание #{id} отменено")
+            
+            if reminder.id in self.reminders:
+                del self.reminders[reminder.id]
+                
+        except Exception as e:
+            logger.error(f"❌ Ошибка при отмене напоминания: {e}", exc_info=True)
+            raise
 
     async def schedule_reminder(self, reminder: Reminder):
         """Запланировать одно напоминание в APScheduler"""
-    
-        # 1️⃣ Создать функцию которая выполнится в нужное время
-        async def send_reminder():
-            """Эта функция вызовется в reminder.remind_at"""
-            try:
-                # Отправить сообщение
-                if self.bot:
+        
+        try:
+            # 1️⃣ Создать функцию которая выполнится в нужное время
+            async def send_reminder():
+                """Эта функция вызовется в reminder.remind_at или по cron"""
+                try:
+                    if not self.bot:
+                        logger.warning(f"⚠️ Bot не инициализирован для напоминания #{reminder.id}")
+                        return
+                    
+                    # Отправить сообщение
                     await self.bot.send_message(
                         chat_id=reminder.telegram_id,
                         text=f"🔔 НАПОМИНАНИЕ!\n\n{reminder.text}"
                     )
+                    
+                    logger.info(f"✅ Напоминание #{reminder.id} отправлено")
+                    
+                    # ⚠️ ВАЖНО: менять статус ТОЛЬКО для ONCE
+                    # Для DAILY/WEEKLY/MONTHLY оставляем ACTIVE
+                    if reminder.repeated_value == RepeatedValue.ONCE:
+                        await self.reminderRepo.update(
+                            self.session,
+                            reminder.id,
+                            status=Status.COMPLETED
+                        )
+                        
+                        # Удалить из активных
+                        if reminder.id in self.reminders:
+                            del self.reminders[reminder.id]
+                
+                except Exception as e:
+                    logger.error(f"❌ Ошибка при отправке напоминания #{reminder.id}: {e}", exc_info=True)
             
-                    # Обновить статус в БД
-                    await self.reminderRepo.update(
-                        self.session,
-                        reminder.id,
-                        status=ReminderStatus.COMPLETED
+            # 2️⃣ Создать уникальный ID для этой задачи
+            job_id = f'reminder_{reminder.id}'
+
+            if reminder.repeated_value == RepeatedValue.ONCE:
+                # РАЗОВОЕ НАПОМИНАНИЕ (ONCE)
+                # Конвертировать в timezone-aware
+                remind_at_aware = self._make_aware(reminder.remind_at)
+                now = datetime.now(self.tz)
+                
+                # Только если время ещё не прошло
+                if remind_at_aware <= now:
+                    logger.warning(f"⏭️ Напоминание #{reminder.id} пропущено (время в прошлом: {remind_at_aware})")
+                    return
+                
+                self.scheduler.add_job(
+                    send_reminder,
+                    'date',
+                    run_date=remind_at_aware,
+                    id=job_id,
+                    replace_existing=True
+                )
+                self.reminders[reminder.id] = job_id
+                logger.info(
+                    f"   ✅ #{reminder.id}: {reminder.text} → {remind_at_aware.strftime('%Y-%m-%d %H:%M')}"
+                )
+
+            elif reminder.repeated_value == RepeatedValue.DAILY:
+                # ЕЖЕДНЕВНОЕ НАПОМИНАНИЕ (DAILY)
+                self.scheduler.add_job(
+                    send_reminder,
+                    'cron',
+                    hour=reminder.remind_at.hour,
+                    minute=reminder.remind_at.minute,
+                    id=job_id,
+                    replace_existing=True
+                )
+                self.reminders[reminder.id] = job_id
+                logger.info(
+                    f"   ♻️ ЕЖЕДНЕВНО: #{reminder.id}: {reminder.text} → каждый день в {reminder.remind_at.strftime('%H:%M')}"
+                )
+
+            elif reminder.repeated_value == RepeatedValue.WEEKLY:
+                # ЕЖЕНЕДЕЛЬНОЕ НАПОМИНАНИЕ (WEEKLY)
+                # weekday: 0=Mon, 1=Tue, ..., 6=Sun
+                self.scheduler.add_job(
+                    send_reminder,
+                    'cron',
+                    day_of_week=reminder.remind_at.weekday(),
+                    hour=reminder.remind_at.hour,
+                    minute=reminder.remind_at.minute,
+                    id=job_id,
+                    replace_existing=True
+                )
+                self.reminders[reminder.id] = job_id
+                logger.info(
+                    f"   🔁 ЕЖЕНЕДЕЛЬНО: #{reminder.id}: {reminder.text} → каждый {reminder.remind_at.strftime('%A')} в {reminder.remind_at.strftime('%H:%M')}"
+                )
+
+            elif reminder.repeated_value == RepeatedValue.MONTHLY:
+                # ЕЖЕМЕСЯЧНОЕ НАПОМИНАНИЕ (MONTHLY)
+                # ⚠️ Проблема: если день > 28, то февраль не сработает
+                # Решение: использовать 'last_day_of_month' или обработать исключение
+                day = reminder.remind_at.day
+                
+                # Проверка: если день > 28, напомним об этом
+                if day > 28:
+                    logger.warning(
+                        f"⚠️ Напоминание #{reminder.id} на {day}-го числа может не сработать "
+                        f"в месяцы с меньшим количеством дней (февраль, апрель и т.д.)"
                     )
-            
-                    # Удалить из активных
-                    if reminder.id in self.reminders:
-                        del self.reminders[reminder.id]
-            
-                    print(f"✅ Напоминание #{reminder.id} отправлено")
-                else:
-                    print(f"✅ Напоминание #{reminder.id} не может быть отправлено")
-        
-            except Exception as e:
-                print(f"❌ Ошибка: {e}")
-    
-        # 2️⃣ Создать уникальный ID для этой задачи
-        job_id = f'reminder_{reminder.id}'
+                
+                self.scheduler.add_job(
+                    send_reminder,
+                    'cron',
+                    day=day,
+                    hour=reminder.remind_at.hour,
+                    minute=reminder.remind_at.minute,
+                    id=job_id,
+                    replace_existing=True
+                )
+                self.reminders[reminder.id] = job_id
+                logger.info(
+                    f"   🗓️ ЕЖЕМЕСЯЧНО: #{reminder.id}: {reminder.text} → каждый месяц, {day}-го в {reminder.remind_at.strftime('%H:%M')}"
+                )
 
-        if reminder.repeated_value == RepeatedValue.ONCE:
-            # 3️⃣ Добавить в APScheduler
-            self.scheduler.add_job(
-                send_reminder,                 # Функция которая выполнится
-                'date',                        # Тип триггера (один раз)
-                run_date=reminder.remind_at,   # Когда выполнить
-                id=job_id,                     # Уникальный ID
-                replace_existing=True          # Если уже есть - заменить
-            )
-    
-            # 4️⃣ Запомнить в словаре
-            self.reminders[reminder.id] = job_id
-    
-            # 5️⃣ Логирование
-            print(f"   ✅ #{reminder.id}: {reminder.text} → {reminder.remind_at}")
-
-        elif reminder.repeated_value == RepeatedValue.DAILY:
-           # → APScheduler cron trigger: каждый день в remind_at.time()
-           self.scheduler.add_job(
-               send_reminder,
-               'cron',
-               hour=reminder.remind_at.hour,
-               minute=reminder.remind_at.minute,
-               id=job_id,
-               replace_existing=True
-           )
-           self.reminders[reminder.id] = job_id
-           print(
-               f"   ♻️ ЕЖЕДНЕВНО: #{reminder.id}: {reminder.text} → каждый день в {reminder.remind_at.strftime('%H:%M')}"
-           )
-
-       # ЕЖЕНЕДЕЛЬНОЕ НАПОМИНАНИЕ (WEEKLY)
-        elif reminder.repeated_value == RepeatedValue.WEEKLY:
-           # → APScheduler cron trigger: каждую неделю, в день недели и время как у remind_at
-           self.scheduler.add_job(
-               send_reminder,
-               'cron',
-               day_of_week=reminder.remind_at.weekday(),  # 0=Mon, 6=Sun
-               hour=reminder.remind_at.hour,
-               minute=reminder.remind_at.minute,
-               id=job_id,
-               replace_existing=True
-           )
-           self.reminders[reminder.id] = job_id
-           print(
-               f"   🔁 ЕЖЕНЕДЕЛЬНО: #{reminder.id}: {reminder.text} → каждую неделю (день={reminder.remind_at.strftime('%A')}, время={reminder.remind_at.strftime('%H:%M')})"
-           )
-
-       # ЕЖЕМЕСЯЧНОЕ НАПОМИНАНИЕ (MONTHLY)
-        elif reminder.repeated_value == RepeatedValue.MONTHLY:
-           # → APScheduler cron: каждый месяц, такого же числа, в remind_at.time()
-           self.scheduler.add_job(
-               send_reminder,
-               'cron',
-               day=reminder.remind_at.day,
-               hour=reminder.remind_at.hour,
-               minute=reminder.remind_at.minute,
-               id=job_id,
-               replace_existing=True
-           )
-           self.reminders[reminder.id] = job_id
-           print(
-               f"   🗓️ ЕЖЕМЕСЯЧНО: #{reminder.id}: {reminder.text} → каждый месяц, {reminder.remind_at.day}-го в {reminder.remind_at.strftime('%H:%M')}"
-           )
-
-
+        except Exception as e:
+            logger.error(f"❌ Ошибка при планировании напоминания #{reminder.id}: {e}", exc_info=True)

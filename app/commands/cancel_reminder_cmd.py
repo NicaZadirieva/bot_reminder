@@ -2,7 +2,7 @@
 from .base import BotCommand
 from aiogram import types
 from app.repositories.base import IRepository
-from app.entities.reminder import ReminderStatus
+from app.database.models import Status
 from typing import Any
 from app.schedulers.reminder_scheduler import ReminderScheduler
 
@@ -18,15 +18,16 @@ class CancelReminderCommand(BotCommand):
             # ✅ Парсить ID из команды
             # message.text = "/cancel_reminder 123"
             reminder_id = int(message.text.split(" ")[-1])
-
-            await self.reminderScheduler.cancel_reminder_job(reminder_id)
-            
             # ✅ Обновить ТОЛЬКО статус
             updated = await self.repo.update(
                 self.session,
                 reminder_id,
-                status=ReminderStatus.CANCELLED
+                status=Status.CANCELLED
             )
+            
+
+            await self.reminderScheduler.cancel_reminder_job(reminder_id)
+            
             
             if updated:
                 await message.reply(f"✅ Напоминание #{reminder_id} отменено")
