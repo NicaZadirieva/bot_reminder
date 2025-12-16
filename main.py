@@ -10,13 +10,25 @@ from aiogram import Dispatcher, Bot
 
 from app.schedulers.reminder_scheduler import ReminderScheduler
 
+import logging
+
+def setup_logger():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - [%(levelname)s] - %(name)s - %(message)s",
+    )
+    
+    # Отключить шум от сторонних библиотек (поставить им уровень выше)
+    logging.getLogger("apscheduler").setLevel(logging.WARNING)
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+
 
 async def main():
+    setup_logger()
     async with async_session() as session:
         bot = Bot(token=config.BOT_TOKEN)
         repo = ReminderRepository()
         remindScheduler = ReminderScheduler(session, repo, bot)
-        await remindScheduler.load_reminders()
         parser = ReminderParser()
         
         reminderDispatcher = ReminderDispatcher(repo, session, parser, remindScheduler)
@@ -49,6 +61,14 @@ async def main():
         ))
         async def handle_reminder_list_command(message: types.Message):
             await reminderDispatcher.listDispatch(message)
+
+        @router.message()  # ← Без фильтров - ловит ВСЕ остальные сообщения
+        async def handle_no_match(message: types.Message):
+            """Обработать сообщения, которые не совпадают ни с чем"""
+            await message.answer(
+                "❌ Команда не найдена.\n\n"
+                "Используй /help для списка команд"
+            )
 
         dp = Dispatcher()
         dp.include_router(router)
