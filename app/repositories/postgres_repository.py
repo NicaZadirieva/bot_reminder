@@ -12,10 +12,6 @@ class PostgresRepository(IRepository):
         return await session.get(self.model, id)
 
     async def get_by_telegram_id(self, session, telegram_id: int):
-        return await session.get(self.model, telegram_id)
-
-    
-    async def get_by_telegram_id(self, session, telegram_id: int):
         query = select(self.model).where(self.model.telegram_id == telegram_id)
         result = await session.execute(query)
         return result.scalars().all()

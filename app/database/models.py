@@ -31,11 +31,11 @@ class Reminder(Base):
     text = Column(String(200), nullable=False)
     remind_at = Column(DateTime, nullable=False)
     priority = Column(
-        SQLEnum(Priority),  # ← SQLEnum используется только здесь в Column
+        SQLEnum(Priority),
         default=Priority.MEDIUM
     )
     status = Column(
-        SQLEnum(Status),  # ← SQLEnum используется только здесь в Column
+        SQLEnum(Status),
         default=Status.ACTIVE
     )
     created_at = Column(DateTime, default=datetime.now)
