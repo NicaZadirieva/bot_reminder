@@ -71,22 +71,21 @@ class ReminderParser:
         # ============ ФОРМАТ 4: Относительное время ============
         if time.startswith("через "):
             time_part = time.replace("через", "").strip()
-            
-            match = re.match(r"^(\d+)\s*(час|часа|часов|минут|минута|минуты|день|дня|дней|неделя|недели|недель)$",time_part)
-            
+    
+            match = re.match(r"^(\d+)\s*(часа|часов|час|минута|минуты|минут|день|дня|дней|неделя|недели|недель)$", time_part)
+    
             if match:
                 count = int(match.group(1))
                 unit = match.group(2)
-                
+        
                 if unit in ["час", "часа", "часов"]:
                     return now + timedelta(hours=count)
-                elif unit in ["минута", "минут"]:
+                elif unit in ["минута", "минуты", "минут"]:
                     return now + timedelta(minutes=count)
                 elif unit in ["день", "дня", "дней"]:
                     return now + timedelta(days=count)
-                elif unit in ["неделя", "недель"]:
+                elif unit in ["неделя", "недели", "недель"]:
                     return now + timedelta(weeks=count)
-        
         return None
 
     def parseReminderPriority(self, priority: str) -> Optional[str]:
@@ -97,7 +96,7 @@ class ReminderParser:
         
         try:
             priority_enum = Priority(normalized)
-            return priority_enum.value
+            return priority_enum
         except ValueError:
             return None
 
@@ -105,11 +104,11 @@ class ReminderParser:
         if not freq or not isinstance(freq, str):
             return None
         
-        normalized = freq.strip().lower()
+        normalized = freq.strip().upper()
         
         try:
             freq_enum = RepeatedValue(normalized)
-            return freq_enum.value
+            return freq_enum
         except ValueError:
             return None
 
