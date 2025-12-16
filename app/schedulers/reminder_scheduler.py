@@ -205,6 +205,33 @@ class ReminderScheduler:
                 logger.info(
                     f"   🗓️ ЕЖЕМЕСЯЧНО: #{reminder.id}: {reminder.text} → каждый месяц, {day}-го в {reminder.remind_at.strftime('%H:%M')}"
                 )
+            elif reminder.repeated_value == RepeatedValue.YEARLY:
+                 # ЕЖЕГОДНОЕ НАПОМИНАНИЕ (YEARLY)
+                month = reminder.remind_at.month
+                day = reminder.remind_at.day
+            
+                # Проверка: если 29 февраля, напомним об этом
+                if month == 2 and day == 29:
+                    logger.warning(
+                        f"⚠️ Напоминание #{reminder.id} на 29 февраля может не сработать "
+                        f"в невисокосные годы"
+                    )
+            
+                self.scheduler.add_job(
+                    send_reminder,
+                    'cron',
+                    month=month,
+                    day=day,
+                    hour=reminder.remind_at.hour,
+                    minute=reminder.remind_at.minute,
+                    id=job_id,
+                    replace_existing=True
+                )
+                self.reminders[reminder.id] = job_id
+                logger.info(
+                    f"   📅 ЕЖЕГОДНО: #{reminder.id}: {reminder.text} → каждый год, "
+                    f"{reminder.remind_at.strftime('%d %B')} в {reminder.remind_at.strftime('%H:%M')}"
+                )
 
         except Exception as e:
             logger.error(f"❌ Ошибка при планировании напоминания #{reminder.id}: {e}", exc_info=True)

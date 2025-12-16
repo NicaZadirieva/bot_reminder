@@ -1,8 +1,8 @@
-"""Initial schema without User
+"""Initial schema
 
-Revision ID: b6864277e278
+Revision ID: 95f3307ef2b4
 Revises: 
-Create Date: 2025-12-12 17:45:28.973419
+Create Date: 2025-12-16 21:38:25.013861
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'b6864277e278'
+revision: str = '95f3307ef2b4'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,7 +29,7 @@ def upgrade() -> None:
     sa.Column('priority', sa.Enum('LOW', 'MEDIUM', 'HIGH', name='priority'), nullable=True),
     sa.Column('status', sa.Enum('ACTIVE', 'COMPLETED', 'CANCELLED', name='status'), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('repeated_value', sa.Enum('ONCE', 'DAILY', 'WEEKLY', 'MONTHLY', name='repeated_value_enum'), nullable=True),
+    sa.Column('repeated_value', sa.Enum('ONCE', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', name='repeated_value_enum'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

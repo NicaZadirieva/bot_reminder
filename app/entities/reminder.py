@@ -18,6 +18,7 @@ class RepeatedValue(Enum):
     DAILY = "daily"
     WEEKLY = "weekly"
     MONTHLY = "monthly"
+    YEARLY = "yearly"
 
 @dataclass
 class Reminder:
