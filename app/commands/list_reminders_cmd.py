@@ -12,20 +12,21 @@ class ListRemindersCommand(BotCommand):
         super().__init__()
 
     async def printAllReminders(self, reminders: List[Reminder], message: types.Message):
-        answer_text = ""
+        answer_text = []
         for reminder in reminders:
-            answer_text = answer_text + "\n" + (f'''
-                #{reminder.id} 📝 {reminder.text}
-                ⏰ {reminder.remind_at}
-                🔔 {reminder.status} | 🔄 ${reminder.repeated_value}
-            ''')
-        if answer_text:
-            await message.answer(answer_text)
+            answer_text.append(
+                "\n".join([
+                f"#{reminder.id} 📝 {reminder.text}",
+                f"⏰ {reminder.remind_at}",
+                f"🔔 {reminder.status} | 🔄 ${reminder.repeated_value}"])
+            )
+        if len(answer_text) > 0:
+            await message.answer("\n\n".join(answer_text))
         else:
             await message.answer('Нет напоминаний')
 
     async def execute(self, message: types.Message):
         reminders = await self.repo.get_all(self.session)
         reminders = [r for r in reminders if r.telegram_id == message.from_user.id]
-        message.answer("📋 Ваши напоминания: \n")
+        await message.answer("📋 Ваши напоминания: \n")
         await self.printAllReminders(reminders, message)

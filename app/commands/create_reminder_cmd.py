@@ -26,5 +26,5 @@ class CreateReminderCommand(BotCommand):
             await message.answer("✅ Напоминание создано!")
         except Exception as e:
             logger.error(e)
-            await message.answer("Формат данных не соответсвует команде")
+            await message.answer("Формат данных не соответствует команде")
 
