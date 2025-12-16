@@ -5,6 +5,8 @@ from app.repositories.base import IRepository
 from aiogram import types
 from typing import Optional, List, Any
 from app.schedulers.reminder_scheduler import ReminderScheduler
+import logging
+logger = logging.getLogger(__name__)
 
 class CreateReminderCommand(BotCommand):
     def __init__(self, repo: IRepository, session: Any, parser: ReminderParser, reminderScheduler: ReminderScheduler):
@@ -23,6 +25,6 @@ class CreateReminderCommand(BotCommand):
             await self.reminderScheduler.schedule_reminder(reminder)
             await message.answer("✅ Напоминание создано!")
         except Exception as e:
-            print(e)
+            logger.error(e)
             await message.answer("Формат данных не соответсвует команде")
 
