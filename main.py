@@ -36,15 +36,8 @@ async def main():
         reminderDispatcher = ReminderDispatcher(reminderService, parser, remindScheduler)
         router = Router()
 
-
         @router.message(Command(
-            'start'
-        ))
-        async def handle_reminder_simple_command(message: types.Message):
-            await remindScheduler.load_reminders(message.from_user.id)
-            await reminderDispatcher.simpleDispatch(message)
-
-        @router.message(Command(
+            'start',
             'help'
         ))
         async def handle_reminder_help_command(message: types.Message):

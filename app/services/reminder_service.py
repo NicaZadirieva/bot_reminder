@@ -6,7 +6,7 @@ from typing import Optional, List, Any
 from datetime import datetime, timedelta, timezone as dt_timezone
 from pytz import timezone
 
-from app.utils import Utils
+from app.utils.Utils import Utils
 import logging
 logger = logging.getLogger(__name__)
 
@@ -26,12 +26,12 @@ class ReminderService:
         all_reminders = await self.reminderRepo.get_all(self.dbSession)
         return self.filter_reminders_by_user(all_reminders, user_id)
 
-    async def get_all_active_reminders(self, user_id: int):
+    async def get_all_active_reminders(self):
         # 1️⃣ Получить ВСЕ напоминания
-        filtered_reminders = await self.get_all_reminders(user_id)
-            
+        all_reminders = await self.reminderRepo.get_all(self.dbSession)
+ 
         # 2️⃣ Отфильтровать АКТИВНЫЕ
-        active = [r for r in filtered_reminders if r.status == Status.ACTIVE]
+        active = [r for r in all_reminders if r.status == Status.ACTIVE]
             
         # 3️⃣ Для ONCE - отфильтровать БУДУЩИЕ (не прошедшие)
         now = Utils.get_now()
@@ -41,15 +41,13 @@ class ReminderService:
         ]
         return to_schedule
 
-    async def cancel_reminder_by_id(self, id: int, user_id: int):
-        if await self.check_if_reminder_exists(id, user_id):
-            return await self.reminderRepo.update(
-                  self.dbSession,
-                  id,
-                  status=Status.COMPLETED
-            )
-        else:
-            return None
+    async def cancel_reminder_by_id(self, id: int):
+        return await self.reminderRepo.update(
+           self.dbSession,
+           id,
+           status=Status.COMPLETED
+        )
+
 
     async def create_reminder(self, reminder: Reminder):
         return await self.reminderRepo.create(self.session, reminder);

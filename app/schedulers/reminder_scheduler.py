@@ -7,7 +7,7 @@ from pytz import timezone
 import logging
 
 from app.services.reminder_service import ReminderService
-from app.utils import Utils
+from app.utils.Utils import Utils
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class ReminderScheduler:
         if not self.scheduler.running:
             self.scheduler.start()
             logger.info("✅ Scheduler запущен")
-            #await self.load_reminders()
+            await self.load_reminders()
 
     async def shutdown(self):
         """⏹️ Остановить scheduler"""
@@ -35,12 +35,12 @@ class ReminderScheduler:
 
    
 
-    async def load_reminders(self, user_id: int):
+    async def load_reminders(self):
         """📥 Загрузить ВСЕ активные напоминания из БД"""
         logger.info("📥 Загружаю напоминания...")
         
         try:
-            to_schedule = await self.reminderService.get_all_active_reminders(user_id)
+            to_schedule = await self.reminderService.get_all_active_reminders()
             
             for reminder in to_schedule:
                 await self.schedule_reminder(reminder)
@@ -68,7 +68,7 @@ class ReminderScheduler:
             logger.error(f"❌ Ошибка при отмене напоминания: {e}", exc_info=True)
             raise
 
-    async def schedule_reminder(self, reminder: Reminder, user_id: int):
+    async def schedule_reminder(self, reminder: Reminder):
         """Запланировать одно напоминание в APScheduler"""
         try:
             # 1️⃣ Создать функцию которая выполнится в нужное время
@@ -90,7 +90,7 @@ class ReminderScheduler:
                     # ⚠️ ВАЖНО: менять статус ТОЛЬКО для ONCE
                     # Для DAILY/WEEKLY/MONTHLY оставляем ACTIVE
                     if reminder.repeated_value == RepeatedValue.ONCE:
-                        await self.reminderService.cancel_reminder_by_id(reminder.id, user_id)
+                        await self.reminderService.cancel_reminder_by_id(reminder.id)
                         # Удалить из активных
                         if reminder.id in self.reminders:
                             del self.reminders[reminder.id]
