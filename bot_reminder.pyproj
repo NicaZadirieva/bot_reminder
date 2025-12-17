@@ -57,6 +57,7 @@
     <Compile Include="app\tests\test_reminder_repository.py" />
     <Compile Include="app\tests\test_service.py" />
     <Compile Include="app\tests\__init__.py" />
+    <Compile Include="app\utils\Utils.py" />
     <Compile Include="app\__init__.py" />
     <Compile Include="main.py" />
   </ItemGroup>
@@ -68,6 +69,7 @@
     <Folder Include="app\database" />
     <Folder Include="app\entities" />
     <Folder Include="app\dispatchers\" />
+    <Folder Include="app\utils\" />
     <Folder Include="app\parsers" />
     <Folder Include="app\repositories" />
     <Folder Include="app\schedulers" />

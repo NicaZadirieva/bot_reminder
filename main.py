@@ -5,6 +5,7 @@ from app.config import config
 from app.dispatchers.reminder_dispatcher import ReminderDispatcher
 from app.parsers.reminder_parser import ReminderParser
 from app.repositories.reminder_repository import ReminderRepository
+from app.services.reminder_service import ReminderService
 from app.database.connection import async_session
 from aiogram import Dispatcher, Bot
 
@@ -28,19 +29,25 @@ async def main():
     async with async_session() as session:
         bot = Bot(token=config.BOT_TOKEN)
         repo = ReminderRepository()
-        remindScheduler = ReminderScheduler(session, repo, bot)
+        reminderService = ReminderService(repo, session)
+        remindScheduler = ReminderScheduler(reminderService, bot)
         parser = ReminderParser()
         
-        reminderDispatcher = ReminderDispatcher(repo, session, parser, remindScheduler)
+        reminderDispatcher = ReminderDispatcher(reminderService, parser, remindScheduler)
         router = Router()
 
 
-
         @router.message(Command(
-            'start',
-            'help'
+            'start'
         ))
         async def handle_reminder_simple_command(message: types.Message):
+            await remindScheduler.load_reminders(message.from_user.id)
+            await reminderDispatcher.simpleDispatch(message)
+
+        @router.message(Command(
+            'help'
+        ))
+        async def handle_reminder_help_command(message: types.Message):
             await reminderDispatcher.simpleDispatch(message)
 
         @router.message(Command(

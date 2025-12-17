@@ -1,14 +1,13 @@
 ﻿# Get all list of reminders
 from app.database.models import Reminder
-from app.repositories.base import IRepository
+from app.services.reminder_service import ReminderService
 from .base import BotCommand
 from aiogram import types
 from typing import Optional, List, Any
 
 class ListRemindersCommand(BotCommand):
-    def __init__(self, repo: IRepository, session: Any):
-        self.repo = repo
-        self.session = session
+    def __init__(self, reminderService: ReminderService):
+        self.reminderService = reminderService
         super().__init__()
 
     async def printAllReminders(self, reminders: List[Reminder], message: types.Message):
@@ -26,7 +25,6 @@ class ListRemindersCommand(BotCommand):
             await message.answer('Нет напоминаний')
 
     async def execute(self, message: types.Message):
-        reminders = await self.repo.get_all(self.session)
-        reminders = [r for r in reminders if r.telegram_id == message.from_user.id]
+        reminders = await self.reminderService.get_all_reminders(message.from_user.id)
         await message.answer("📋 Ваши напоминания: \n")
         await self.printAllReminders(reminders, message)
