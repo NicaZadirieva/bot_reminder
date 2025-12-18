@@ -43,6 +43,8 @@
     <Compile Include="app\di_container.py" />
     <Compile Include="app\entities\reminder.py" />
     <Compile Include="app\dispatchers\reminder_dispatcher.py" />
+    <Compile Include="app\mappers\from_entity_to_model.py" />
+    <Compile Include="app\mappers\from_model_to_entity.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
     <Compile Include="app\repositories\base.py" />
     <Compile Include="app\repositories\fake_repository.py" />
@@ -71,6 +73,7 @@
     <Folder Include="app\database" />
     <Folder Include="app\entities" />
     <Folder Include="app\dispatchers\" />
+    <Folder Include="app\mappers\" />
     <Folder Include="app\utils\" />
     <Folder Include="app\parsers" />
     <Folder Include="app\repositories" />
