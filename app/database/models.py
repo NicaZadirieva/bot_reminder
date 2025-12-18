@@ -6,17 +6,17 @@ from enum import Enum as PyEnum
 class Base(DeclarativeBase):
     pass
 
-class Priority(PyEnum):  # ← Наследуй от PyEnum
+class Priority(PyEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
 
-class Status(PyEnum):  # ← Наследуй от PyEnum
+class Status(PyEnum):
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
-class RepeatedValue(PyEnum):  # ← Наследуй от PyEnum
+class RepeatedValue(PyEnum):
     ONCE = "ONCE"
     DAILY = "DAILY"
     WEEKLY = "WEEKLY"
