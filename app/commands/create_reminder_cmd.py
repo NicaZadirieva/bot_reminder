@@ -20,7 +20,7 @@ class CreateReminderCommand(BotCommand):
         user_text = message.text.replace("/remind", "")
         try:
             reminder = self.parser.parse(user_text, message.from_user.id)
-            await self.reminderService.create_reminder(reminder);
+            reminder = await self.reminderService.create_reminder(reminder);
             await self.reminderScheduler.schedule_reminder(reminder)
             await message.answer("✅ Напоминание создано!")
         except Exception as e:
