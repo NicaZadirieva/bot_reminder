@@ -1,4 +1,4 @@
-﻿from app.database.models import Reminder, RepeatedValue, Status
+﻿from app.entities.reminder import Reminder, RepeatedValue, ReminderStatus
 from typing import Optional, List, Any
 from datetime import datetime, timedelta, timezone as dt_timezone
 from aiogram import Bot

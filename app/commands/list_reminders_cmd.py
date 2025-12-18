@@ -1,5 +1,5 @@
 ﻿# Get all list of reminders
-from app.database.models import Reminder
+from app.entities.reminder import Reminder
 from app.services.reminder_service import ReminderService
 from .base import BotCommand
 from aiogram import types

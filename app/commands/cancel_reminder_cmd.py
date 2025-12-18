@@ -2,7 +2,6 @@
 from app.services.reminder_service import ReminderService
 from .base import BotCommand
 from aiogram import types
-from app.database.models import Status
 from typing import Any
 from app.schedulers.reminder_scheduler import ReminderScheduler
 
