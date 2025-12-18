@@ -1,10 +1,14 @@
 ﻿ # Business logics
+from app.mappers.from_entity_to_model import from_entity_to_model
+from app.mappers.from_model_to_entity import from_model_to_entity
 from app.repositories.reminder_repository import ReminderRepository
 from typing import Any
-from app.database.models import Reminder, RepeatedValue, Status
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Array
 from datetime import datetime, timedelta, timezone as dt_timezone
 from pytz import timezone
+
+from app.entities.reminder import Reminder as ReminderEntity, ReminderStatus as ReminderStatusEntity, RepeatedValue as RepeatedValueEntity, Priority as PriorityEntity
+from app.database.models import Reminder as ReminderDb, RepeatedValue as RepeatedValueDb, Status as ReminderStatusDb, Priority as PriorityDb
 
 from app.utils.Utils import Utils
 import logging
@@ -16,11 +20,14 @@ class ReminderService:
         self.dbSession = dbSession
 
     async def check_if_reminder_exists(self, id: int, user_id: int):
-        reminder = await self.reminderRepo.get_by_id(self.dbSession, id)
-        if reminder.telegram_id != user_id:
+        reminderDb = await self.reminderRepo.get_by_id(self.dbSession, id)
+        if reminderDb.telegram_id != user_id:
             # напоминание не принадлежит пользователю
             return False
-        return reminder is None
+        return reminderDb is None
+
+    def filter_reminders_by_user(self, reminders, user_id: int):
+        return [from_model_to_entity(r) for r in reminders if r.telegram_id == user_id]
 
     async def get_all_reminders(self, user_id: int):
         all_reminders = await self.reminderRepo.get_all(self.dbSession)
@@ -31,26 +38,26 @@ class ReminderService:
         all_reminders = await self.reminderRepo.get_all(self.dbSession)
  
         # 2️⃣ Отфильтровать АКТИВНЫЕ
-        active = [r for r in all_reminders if r.status == Status.ACTIVE]
+        active = [r for r in all_reminders if r.status == ReminderStatusDb.ACTIVE]
             
         # 3️⃣ Для ONCE - отфильтровать БУДУЩИЕ (не прошедшие)
         now = Utils.get_now()
         to_schedule = [
                 r for r in active 
-                if r.repeated_value != RepeatedValue.ONCE or Utils._make_aware(r.remind_at) > now
+                if r.repeated_value != RepeatedValueDb.ONCE or Utils._make_aware(r.remind_at) > now
         ]
-        return to_schedule
+        return [from_model_to_entity(r) for r in to_schedule]
 
     async def cancel_reminder_by_id(self, id: int):
-        return await self.reminderRepo.update(
+        reminderDb = await self.reminderRepo.update(
            self.dbSession,
            id,
-           status=Status.COMPLETED
+           status=ReminderStatusDb.COMPLETED
         )
+        return from_model_to_entity(reminderDb)
 
 
-    async def create_reminder(self, reminder: Reminder):
-        return await self.reminderRepo.create(self.session, reminder);
+    async def create_reminder(self, reminder: ReminderEntity):
+        reminderDb = await self.reminderRepo.create(self.session, from_entity_to_model(reminder));
+        return from_model_to_entity(reminderDb)
 
-    def filter_reminders_by_user(self, reminders, user_id: int):
-        return [r for r in reminders if r.telegram_id == user_id]
