@@ -1,5 +1,4 @@
-﻿from app.database.models import Reminder, RepeatedValue, Status
-from app.repositories.reminder_repository import ReminderRepository
+﻿from app.entities.reminder import Reminder, RepeatedValue, ReminderStatus
 from typing import Optional, List, Any
 from datetime import datetime, timedelta, timezone as dt_timezone
 from aiogram import Bot
@@ -7,13 +6,15 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import logging
 
+from app.services.reminder_service import ReminderService
+from app.utils.Utils import Utils
+
 logger = logging.getLogger(__name__)
 
 
 class ReminderScheduler:
-    def __init__(self, session: Any, reminderRepo: ReminderRepository, bot: Bot):
-        self.reminderRepo = reminderRepo
-        self.session = session
+    def __init__(self, reminderService: ReminderService, bot: Bot):
+        self.reminderService = reminderService
         self.bot = bot
         self.reminders = dict()
         self.tz = timezone('Europe/Moscow')
@@ -32,32 +33,15 @@ class ReminderScheduler:
             self.scheduler.shutdown()
             logger.info("✅ Scheduler остановлен")
 
-    def _make_aware(self, dt: datetime) -> datetime:
-        """🔧 Конвертировать naive datetime в timezone-aware"""
-        if dt.tzinfo is None:
-            # Если datetime naive, добавить timezone Moscow
-            return self.tz.localize(dt)
-        return dt
+   
 
     async def load_reminders(self):
         """📥 Загрузить ВСЕ активные напоминания из БД"""
         logger.info("📥 Загружаю напоминания...")
         
         try:
-            # 1️⃣ Получить ВСЕ напоминания
-            all_reminders = await self.reminderRepo.get_all(self.session)
+            to_schedule = await self.reminderService.get_all_active_reminders()
             
-            # 2️⃣ Отфильтровать АКТИВНЫЕ
-            active = [r for r in all_reminders if r.status == Status.ACTIVE]
-            
-            # 3️⃣ Для ONCE - отфильтровать БУДУЩИЕ (не прошедшие)
-            now = datetime.now(self.tz)
-            to_schedule = [
-                r for r in active 
-                if r.repeated_value != RepeatedValue.ONCE or self._make_aware(r.remind_at) > now
-            ]
-            
-            # 4️⃣ Запланировать каждое
             for reminder in to_schedule:
                 await self.schedule_reminder(reminder)
             
@@ -66,20 +50,19 @@ class ReminderScheduler:
         except Exception as e:
             logger.error(f"❌ Ошибка при загрузке напоминаний: {e}", exc_info=True)
 
-    async def cancel_reminder_job(self, id: int):
+    async def cancel_reminder_job(self, id: int, user_id: int):
         """❌ Отменить напоминание"""
         try:
-            reminder = await self.reminderRepo.get_by_id(self.session, id)
-            if reminder is None:
+            if not self.reminderService.check_if_reminder_exists(id, user_id):
                 raise Exception(f"Reminder with id={id} not found")
             
-            job_id = f'reminder_{reminder.id}'
+            job_id = f'reminder_{id}'
             if self.scheduler.get_job(job_id):
                 self.scheduler.remove_job(job_id)
                 logger.info(f"✅ Напоминание #{id} отменено")
             
-            if reminder.id in self.reminders:
-                del self.reminders[reminder.id]
+            if id in self.reminders:
+                del self.reminders[id]
                 
         except Exception as e:
             logger.error(f"❌ Ошибка при отмене напоминания: {e}", exc_info=True)
@@ -87,7 +70,6 @@ class ReminderScheduler:
 
     async def schedule_reminder(self, reminder: Reminder):
         """Запланировать одно напоминание в APScheduler"""
-        
         try:
             # 1️⃣ Создать функцию которая выполнится в нужное время
             async def send_reminder():
@@ -108,12 +90,7 @@ class ReminderScheduler:
                     # ⚠️ ВАЖНО: менять статус ТОЛЬКО для ONCE
                     # Для DAILY/WEEKLY/MONTHLY оставляем ACTIVE
                     if reminder.repeated_value == RepeatedValue.ONCE:
-                        await self.reminderRepo.update(
-                            self.session,
-                            reminder.id,
-                            status=Status.COMPLETED
-                        )
-                        
+                        await self.reminderService.cancel_reminder_by_id(reminder.id)
                         # Удалить из активных
                         if reminder.id in self.reminders:
                             del self.reminders[reminder.id]
@@ -127,8 +104,8 @@ class ReminderScheduler:
             if reminder.repeated_value == RepeatedValue.ONCE:
                 # РАЗОВОЕ НАПОМИНАНИЕ (ONCE)
                 # Конвертировать в timezone-aware
-                remind_at_aware = self._make_aware(reminder.remind_at)
-                now = datetime.now(self.tz)
+                remind_at_aware = Utils._make_aware(reminder.remind_at)
+                now = Utils.get_now()
                 
                 # Только если время ещё не прошло
                 if remind_at_aware <= now:

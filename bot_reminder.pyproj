@@ -43,6 +43,8 @@
     <Compile Include="app\di_container.py" />
     <Compile Include="app\entities\reminder.py" />
     <Compile Include="app\dispatchers\reminder_dispatcher.py" />
+    <Compile Include="app\mappers\from_entity_to_model.py" />
+    <Compile Include="app\mappers\from_model_to_entity.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
     <Compile Include="app\repositories\base.py" />
     <Compile Include="app\repositories\fake_repository.py" />
@@ -53,10 +55,13 @@
     <Compile Include="app\schedulers\reminder_scheduler.py" />
     <Compile Include="app\schedulers\__init__.py" />
     <Compile Include="app\services\reminder_service.py" />
+    <Compile Include="app\services\__init__.py" />
     <Compile Include="app\tests\test_parser.py" />
     <Compile Include="app\tests\test_reminder_repository.py" />
     <Compile Include="app\tests\test_service.py" />
     <Compile Include="app\tests\__init__.py" />
+    <Compile Include="app\utils\Utils.py" />
+    <Compile Include="app\utils\__init__.py" />
     <Compile Include="app\__init__.py" />
     <Compile Include="main.py" />
   </ItemGroup>
@@ -68,6 +73,8 @@
     <Folder Include="app\database" />
     <Folder Include="app\entities" />
     <Folder Include="app\dispatchers\" />
+    <Folder Include="app\mappers\" />
+    <Folder Include="app\utils\" />
     <Folder Include="app\parsers" />
     <Folder Include="app\repositories" />
     <Folder Include="app\schedulers" />

@@ -6,17 +6,17 @@ from enum import Enum as PyEnum
 class Base(DeclarativeBase):
     pass
 
-class Priority(PyEnum):  # ← Наследуй от PyEnum
+class Priority(PyEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
 
-class Status(PyEnum):  # ← Наследуй от PyEnum
+class Status(PyEnum):
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
-class RepeatedValue(PyEnum):  # ← Наследуй от PyEnum
+class RepeatedValue(PyEnum):
     ONCE = "ONCE"
     DAILY = "DAILY"
     WEEKLY = "WEEKLY"
@@ -31,11 +31,11 @@ class Reminder(Base):
     text = Column(String(200), nullable=False)
     remind_at = Column(DateTime, nullable=False)
     priority = Column(
-        SQLEnum(Priority),  # ← SQLEnum используется только здесь в Column
+        SQLEnum(Priority),
         default=Priority.MEDIUM
     )
     status = Column(
-        SQLEnum(Status),  # ← SQLEnum используется только здесь в Column
+        SQLEnum(Status),
         default=Status.ACTIVE
     )
     created_at = Column(DateTime, default=datetime.now)
