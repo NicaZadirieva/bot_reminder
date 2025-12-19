@@ -24,7 +24,7 @@ class ReminderService:
         if reminderDb.telegram_id != user_id:
             # напоминание не принадлежит пользователю
             return False
-        return reminderDb is None
+        return not (reminderDb is None)
 
     def filter_reminders_by_user(self, reminders: List[ReminderDb], user_id: int) -> List[ReminderEntity]:
         return [from_model_to_entity(r) for r in reminders if r.telegram_id == user_id]
@@ -48,13 +48,25 @@ class ReminderService:
         ]
         return [from_model_to_entity(r) for r in to_schedule]
 
-    async def cancel_reminder_by_id(self, id: int) -> ReminderEntity:
-        reminderDb = await self.reminderRepo.update(
-           self.dbSession,
-           id,
-           status=ReminderStatusDb.COMPLETED
-        )
-        return from_model_to_entity(reminderDb)
+    async def cancel_reminder_by_id(self, id: int, user_id: Optional[int]) -> ReminderEntity:
+        if user_id is None:
+            reminderDb = await self.reminderRepo.update(
+               self.dbSession,
+               id,
+               status=ReminderStatusDb.CANCELLED
+            )
+            return from_model_to_entity(reminderDb)
+        else:
+            is_reminder_exists = await self.check_if_reminder_exists(id, user_id)
+            if is_reminder_exists:
+                reminderDb = await self.reminderRepo.update(
+                   self.dbSession,
+                   id,
+                   status=ReminderStatusDb.CANCELLED
+                )
+                return from_model_to_entity(reminderDb)
+            else:
+                return None
 
 
     async def create_reminder(self, reminder: ReminderEntity) -> ReminderEntity:

@@ -53,7 +53,8 @@ class ReminderScheduler:
     async def cancel_reminder_job(self, id: int, user_id: int):
         """❌ Отменить напоминание"""
         try:
-            if not self.reminderService.check_if_reminder_exists(id, user_id):
+            is_reminder_exists = await self.reminderService.check_if_reminder_exists(id, user_id)
+            if not is_reminder_exists:
                 raise Exception(f"Reminder with id={id} not found")
             
             job_id = f'reminder_{id}'
@@ -90,7 +91,7 @@ class ReminderScheduler:
                     # ⚠️ ВАЖНО: менять статус ТОЛЬКО для ONCE
                     # Для DAILY/WEEKLY/MONTHLY оставляем ACTIVE
                     if reminder.repeated_value == RepeatedValue.ONCE:
-                        await self.reminderService.cancel_reminder_by_id(reminder.id)
+                        await self.reminderService.cancel_reminder_by_id(reminder.id, user_id=None)
                         # Удалить из активных
                         if reminder.id in self.reminders:
                             del self.reminders[reminder.id]
