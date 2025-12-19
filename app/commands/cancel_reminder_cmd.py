@@ -16,15 +16,16 @@ class CancelReminderCommand(BotCommand):
             # ✅ Парсить ID из команды
             # message.text = "/cancel_reminder 123"
             reminder_id = int(message.text.split(" ")[-1])
+            user_id = message.from_user.id
             # ✅ Обновить ТОЛЬКО статус
             updated = await self.reminderService.cancel_reminder_by_id(
-                reminder_id
+                reminder_id, user_id
             )
 
-            if updated:
-                await self.reminderScheduler.cancel_reminder_job(reminder_id)
+            try:
+                await self.reminderScheduler.cancel_reminder_job(reminder_id, user_id)
                 await message.reply(f"✅ Напоминание #{reminder_id} отменено")
-            else:
+            except e:
                 await message.reply(f"❌ Напоминание не найдено")
         
         except ValueError:
