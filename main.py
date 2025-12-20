@@ -1,4 +1,5 @@
 ﻿import asyncio
+import logging.handlers
 from aiogram import Router, types
 from aiogram.filters import Command
 from app.config import config
@@ -8,20 +9,62 @@ from app.repositories.reminder_repository import ReminderRepository
 from app.services.reminder_service import ReminderService
 from app.database.connection import async_session
 from aiogram import Dispatcher, Bot
+from pathlib import Path
 
 from app.schedulers.reminder_scheduler import ReminderScheduler
 
 import logging
 
 def setup_logger():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - [%(levelname)s] - %(name)s - %(message)s",
-    )
+    """
+    Настройка и возврат логгера на основе конфигурации из .env
     
+    Переменные .env:
+    - ENVIRONMENT: development, staging, production
+    - DEBUG: True/False
+    - LOG_LEVEL: DEBUG, INFO, WARNING, ERROR, CRITICAL, EXCEPTION
+    """
+    # Читаем конфиг из .env
+    environment = config.ENVIRONMENT.lower()
+    debug = config.DEBUG
+    log_level_str = config.LOG_LEVEL.upper()
+    
+    # Конвертируем строковый уровень логирования в константу logging
+    log_level = getattr(logging, log_level_str, logging.INFO)
+    
+    # Формат логирования
+    if debug or environment == 'development':
+        # Развёрнутый формат для разработки
+        log_format = '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
+    else:
+        # Компактный формат для продакшена
+        log_format = '%(asctime)s - %(levelname)s - %(message)s'
+    
+    # Создаём директорию для логов
+    logs_dir = Path('logs')
+    logs_dir.mkdir(exist_ok=True)
+
+    
+
+    # Настраиваем базовую конфигурацию логгера
+    logging.basicConfig(
+        level=log_level,
+        format=log_format,
+        datefmt='%Y-%m-%d %H:%M:%S',
+        handlers=[
+            # Консольный обработчик
+            logging.StreamHandler(),
+            # Файловый обработчик
+            logging.FileHandler(
+                filename=f'logs/app_{environment}.log',
+                encoding='utf-8'
+            )
+        ]
+    )
     # Отключить шум от сторонних библиотек (поставить им уровень выше)
     logging.getLogger("apscheduler").setLevel(logging.WARNING)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+    
 
 
 async def main():
