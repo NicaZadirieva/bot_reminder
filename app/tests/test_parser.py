@@ -1,5 +1,5 @@
-﻿ # Parser test
- # coding: utf-8
+﻿# Parser test
+# coding: utf-8
 """
 ТЕСТЫ ДЛЯ ReminderParser
 
@@ -157,31 +157,31 @@ class TestParseReminderPriority:
     # ✅ ВАЛИДНЫЕ ПРИОРИТЕТЫ
     def test_parse_priority_high(self, parser):
         """'high'"""
-        assert parser.parseReminderPriority("high") == "high"
+        assert parser.parseReminderPriority("high") == Priority.HIGH
     
     def test_parse_priority_medium(self, parser):
         """'medium'"""
-        assert parser.parseReminderPriority("medium") == "medium"
+        assert parser.parseReminderPriority("medium") == Priority.MEDIUM
     
     def test_parse_priority_low(self, parser):
         """'low'"""
-        assert parser.parseReminderPriority("low") == "low"
+        assert parser.parseReminderPriority("low") == Priority.LOW
     
     # ✅ РАЗНЫЕ РЕГИСТРЫ
     def test_parse_priority_uppercase(self, parser):
         """Приоритет в верхнем регистре"""
-        assert parser.parseReminderPriority("HIGH") == "high"
-        assert parser.parseReminderPriority("MEDIUM") == "medium"
+        assert parser.parseReminderPriority("HIGH") == Priority.HIGH
+        assert parser.parseReminderPriority("MEDIUM") == Priority.MEDIUM
     
     def test_parse_priority_mixed_case(self, parser):
         """Приоритет в смешанном регистре"""
-        assert parser.parseReminderPriority("High") == "high"
-        assert parser.parseReminderPriority("MeDiUm") == "medium"
+        assert parser.parseReminderPriority("High") == Priority.HIGH
+        assert parser.parseReminderPriority("MeDiUm") == Priority.MEDIUM
     
     # ✅ С ПРОБЕЛАМИ
     def test_parse_priority_with_spaces(self, parser):
         """Приоритет с пробелами"""
-        assert parser.parseReminderPriority("  high  ") == "high"
+        assert parser.parseReminderPriority("  high  ") == Priority.HIGH
     
     # ❌ НЕВАЛИДНЫЕ ВХОДЫ
     def test_parse_priority_invalid(self, parser):
@@ -203,24 +203,24 @@ class TestParseReminderFrequency:
     # ✅ ВАЛИДНЫЕ ЧАСТОТЫ
     def test_parse_frequency_once(self, parser):
         """'once'"""
-        assert parser.parseReminderFrequency("once") == "once"
+        assert parser.parseReminderFrequency("once") == RepeatedValue.ONCE
     
     def test_parse_frequency_daily(self, parser):
         """'daily'"""
-        assert parser.parseReminderFrequency("daily") == "daily"
+        assert parser.parseReminderFrequency("daily") == RepeatedValue.DAILY
     
     def test_parse_frequency_weekly(self, parser):
         """'weekly'"""
-        assert parser.parseReminderFrequency("weekly") == "weekly"
+        assert parser.parseReminderFrequency("weekly") == RepeatedValue.WEEKLY
     
     # ✅ РАЗНЫЕ РЕГИСТРЫ
     def test_parse_frequency_uppercase(self, parser):
         """Частота в верхнем регистре"""
-        assert parser.parseReminderFrequency("DAILY") == "daily"
+        assert parser.parseReminderFrequency("DAILY") == RepeatedValue.DAILY
     
     def test_parse_frequency_with_spaces(self, parser):
         """Частота с пробелами"""
-        assert parser.parseReminderFrequency("  daily  ") == "daily"
+        assert parser.parseReminderFrequency("  daily  ") == RepeatedValue.DAILY
     
     # ❌ НЕВАЛИДНЫЕ ВХОДЫ
     def test_parse_frequency_invalid(self, parser):
@@ -279,8 +279,8 @@ class TestReminderParserIntegration:
         assert result is not None
         assert result.text == "Рабочая встреча"
         assert result.remind_at.hour == 9
-        assert result.priority == "high"
-        assert result.repeated_value == "daily"
+        assert result.priority == Priority.HIGH
+        assert result.repeated_value == RepeatedValue.DAILY
     
     def test_parse_example_5(self, parser):
         """Купить подарок | 2024-11-20 19:00 | MEDIUM | once"""
@@ -293,8 +293,8 @@ class TestReminderParserIntegration:
         assert result.remind_at.month == 11
         assert result.remind_at.day == 20
         assert result.remind_at.hour == 19
-        assert result.priority == "medium"
-        assert result.repeated_value == "once"
+        assert result.priority == Priority.MEDIUM
+        assert result.repeated_value == RepeatedValue.ONCE
     
     # ❌ НЕВАЛИДНЫЕ ФОРМАТЫ
     def test_parse_invalid_format(self, parser):
@@ -309,7 +309,7 @@ class TestReminderParserIntegration:
         
         assert result is not None
         assert result.text == "Купить молоко"
-        assert result.priority == "high"
+        assert result.priority == Priority.HIGH
     
     def test_parse_invalid_time_throws_error(self, parser):
         """Невалидное время"""
@@ -318,11 +318,3 @@ class TestReminderParserIntegration:
         # ✅ ПРАВИЛЬНО: Ловить ValueError
         with pytest.raises(ValueError):
             parser.parse(reminder_text, telegram_id=123)
-
-
-# ============ ЗАПУСК ТЕСТОВ ============
-
-# Запусти:
-# pytest app/tests/test_reminder_parser.py -v
-# pytest app/tests/test_reminder_parser.py::TestParseReminderTime -v
-# pytest app/tests/test_reminder_parser.py -v --tb=short
