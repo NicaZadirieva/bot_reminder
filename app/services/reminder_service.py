@@ -21,7 +21,7 @@ class ReminderService:
 
     async def check_if_reminder_exists(self, id: int, user_id: int) -> bool:
         reminderDb = await self.reminderRepo.get_by_id(self.dbSession, id)
-        if reminderDb.telegram_id != user_id:
+        if reminderDb and reminderDb.telegram_id != user_id:
             # напоминание не принадлежит пользователю
             return False
         return not (reminderDb is None)

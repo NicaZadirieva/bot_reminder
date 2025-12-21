@@ -22,10 +22,13 @@ class CancelReminderCommand(BotCommand):
                 reminder_id, user_id
             )
 
-            try:
-                await self.reminderScheduler.cancel_reminder_job(reminder_id, user_id)
-                await message.reply(f"✅ Напоминание #{reminder_id} отменено")
-            except e:
+            if updated:
+                try:
+                    await self.reminderScheduler.cancel_reminder_job(reminder_id, user_id)
+                    await message.reply(f"✅ Напоминание #{reminder_id} отменено")
+                except e:
+                    await message.reply(f"❌ Произошла ошибка. Повторите позже")
+            else:
                 await message.reply(f"❌ Напоминание не найдено")
         
         except ValueError:
