@@ -14,7 +14,7 @@ import re
 
 # ============ ИМПОРТЫ ============
 
-from app.parsers.reminder_parser import ReminderParser
+from app.parsers.reminder_parser import ReminderParser, ReminderDateTimeParser
 from app.entities.reminder import Reminder, Priority, RepeatedValue, ReminderStatus
 
 
@@ -57,7 +57,7 @@ class TestParseReminderTime:
     
     @pytest.fixture
     def parser(self):
-        return ReminderParser()
+        return ReminderDateTimeParser()
     
     # ✅ ВРЕМЯ ДНЕЙ (HH:MM)
     def test_parse_time_today(self, parser):
