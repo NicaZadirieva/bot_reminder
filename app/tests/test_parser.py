@@ -15,7 +15,7 @@ import re
 # ============ ИМПОРТЫ ============
 
 from app.parsers.reminder_desc_parser import ReminderDescParser
-from app.parsers.reminder_parser import ReminderParser
+from app.parsers.reminder_parser import ReminderParser, ReminderPriorityParser
 from app.entities.reminder import Reminder, Priority, RepeatedValue, ReminderStatus
 from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
 
@@ -153,7 +153,7 @@ class TestParseReminderPriority:
     
     @pytest.fixture
     def parser(self):
-        return ReminderParser()
+        return ReminderPriorityParser()
     
     # ✅ ВАЛИДНЫЕ ПРИОРИТЕТЫ
     def test_parse_priority_high(self, parser):

@@ -49,6 +49,7 @@
     <Compile Include="app\parsers\reminder_datetime_parser.py" />
     <Compile Include="app\parsers\reminder_desc_parser.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
+    <Compile Include="app\parsers\reminder_priority_parser.py" />
     <Compile Include="app\repositories\base.py" />
     <Compile Include="app\repositories\fake_repository.py" />
     <Compile Include="app\repositories\fake_reminder_repository.py" />

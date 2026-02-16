@@ -6,25 +6,17 @@ import re
 from app.parsers.from_ru_to_eng_reminder_parts import from_ru_to_eng_reminder_priority, from_ru_to_eng_reminder_freq
 from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
 from app.parsers.reminder_desc_parser import ReminderDescParser
+from app.parsers.reminder_priority_parser import ReminderPriorityParser
+
 # Parser income data
 class ReminderParser:
     def __init__(self):
         self._reminderDateTimeParser = ReminderDateTimeParser()
         self._reminderDescParser = ReminderDescParser()
-
+        self._reminderPriorityParser = ReminderPriorityParser()
     
 
-    def parseReminderPriority(self, priority: str) -> Optional[str]:
-        if not priority or not isinstance(priority, str):
-            return None
-        
-        normalized = priority.strip().lower()
-        
-        try:
-            priority_enum = Priority(normalized)
-            return priority_enum
-        except ValueError:
-            return None
+   
 
     def parseReminderFrequency(self, freq: str):
         if not freq or not isinstance(freq, str):
@@ -65,7 +57,7 @@ class ReminderParser:
                 desc = self._reminderDescParser.parseReminderDescription(reminderParams[0])
                 time = self._reminderDateTimeParser.parseReminderTime(reminderParams[1])
 
-                priority = self.parseReminderPriority(
+                priority = self._reminderPriorityParser.parseReminderPriority(
                     from_ru_to_eng_reminder_priority(reminderParams[2])
                 )
 
@@ -104,7 +96,7 @@ class ReminderParser:
                 desc = self._reminderDescParser.parseReminderDescription(reminderParams[0])
                 time = self._reminderDateTimeParser.parseReminderTime(reminderParams[1])
 
-                priority =  self.parseReminderPriority(
+                priority =  self._reminderPriorityParser.parseReminderPriority(
                     from_ru_to_eng_reminder_priority(reminderParams[2])
                 )
                 frequency = self.parseReminderFrequency(
