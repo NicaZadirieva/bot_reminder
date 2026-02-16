@@ -14,9 +14,10 @@ import re
 
 # ============ ИМПОРТЫ ============
 
-from app.parsers.reminder_parser import ReminderParser, ReminderDateTimeParser
+from app.parsers.reminder_desc_parser import ReminderDescParser
+from app.parsers.reminder_parser import ReminderParser
 from app.entities.reminder import Reminder, Priority, RepeatedValue, ReminderStatus
-
+from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
 
 # ============ ТЕСТЫ parseReminderDescription ============
 
@@ -25,7 +26,7 @@ class TestParseReminderDescription:
     
     @pytest.fixture
     def parser(self):
-        return ReminderParser()
+        return ReminderDescParser()
     
     # ✅ ВАЛИДНЫЕ ВХОДЫ
     def test_parse_description_simple(self, parser):
