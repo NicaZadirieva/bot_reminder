@@ -48,6 +48,7 @@
     <Compile Include="app\parsers\from_ru_to_eng_reminder_parts.py" />
     <Compile Include="app\parsers\reminder_datetime_parser.py" />
     <Compile Include="app\parsers\reminder_desc_parser.py" />
+    <Compile Include="app\parsers\reminder_freq_parser.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
     <Compile Include="app\parsers\reminder_priority_parser.py" />
     <Compile Include="app\repositories\base.py" />
@@ -60,7 +61,12 @@
     <Compile Include="app\schedulers\__init__.py" />
     <Compile Include="app\services\reminder_service.py" />
     <Compile Include="app\services\__init__.py" />
-    <Compile Include="app\tests\test_parser.py" />
+    <Compile Include="app\tests\parsers\test_reminder_datetime_parser.py" />
+    <Compile Include="app\tests\parsers\test_reminder_desc_parser.py" />
+    <Compile Include="app\tests\parsers\test_reminder_freq_parser.py" />
+    <Compile Include="app\tests\parsers\test_reminder_priority_parser.py" />
+    <Compile Include="app\tests\parsers\test_parser.py" />
+    <Compile Include="app\tests\parsers\__init__.py" />
     <Compile Include="app\tests\test_reminder_repository.py" />
     <Compile Include="app\tests\test_service.py" />
     <Compile Include="app\tests\__init__.py" />
@@ -78,6 +84,7 @@
     <Folder Include="app\entities" />
     <Folder Include="app\dispatchers\" />
     <Folder Include="app\mappers\" />
+    <Folder Include="app\tests\parsers\" />
     <Folder Include="app\utils\" />
     <Folder Include="app\parsers" />
     <Folder Include="app\repositories" />
