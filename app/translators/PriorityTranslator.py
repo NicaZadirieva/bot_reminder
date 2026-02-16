@@ -1,21 +1,6 @@
-from typing import Optional
-from app.entities.reminder import Priority
 from app.translators.TranslatorMixin import FromRuTranslatorMixin
 
-class ReminderPriorityParser(FromRuTranslatorMixin):
-    @staticmethod
-    def parseReminderPriority(priority: str) -> Optional[str]:
-        if not priority or not isinstance(priority, str):
-            return None
-        
-        normalized = priority.strip().lower()
-        
-        try:
-            priority_enum = Priority(normalized)
-            return priority_enum
-        except ValueError:
-            return None
-
+class PriorityTranslator(FromRuTranslatorMixin):
     @staticmethod
     def from_ru_to_eng(priority: str):
         """

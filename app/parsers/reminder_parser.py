@@ -1,13 +1,11 @@
 ﻿from app.entities.reminder import Reminder, Priority, RepeatedValue, ReminderStatus
-from datetime import datetime, timedelta
-from typing import Optional
-import re
 
-from app.parsers.from_ru_to_eng_reminder_parts import from_ru_to_eng_reminder_priority, from_ru_to_eng_reminder_freq
 from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
 from app.parsers.reminder_desc_parser import ReminderDescParser
 from app.parsers.reminder_freq_parser import ReminderFrequencyParser
 from app.parsers.reminder_priority_parser import ReminderPriorityParser
+from app.translators.PriorityTranslator import PriorityTranslator
+from app.translators.FreqTranslator import FreqTranslator
 
 # Parser income data
 class ReminderParser:
@@ -39,7 +37,7 @@ class ReminderParser:
                 time = ReminderDateTimeParser.parseReminderTime(reminderParams[1])
 
                 priority = ReminderPriorityParser.parseReminderPriority(
-                    from_ru_to_eng_reminder_priority(reminderParams[2])
+                    PriorityTranslator.from_ru_to_eng(reminderParams[2])
                 )
 
                 if not desc:
@@ -51,7 +49,7 @@ class ReminderParser:
                 if priority is None:
 
                     frequency = ReminderFrequencyParser.parseReminderFrequency(
-                            from_ru_to_eng_reminder_freq(reminderParams[2])
+                            FreqTranslator.from_ru_to_eng(reminderParams[2])
                     )
        
                     if not frequency:
@@ -78,10 +76,10 @@ class ReminderParser:
                 time = ReminderDateTimeParser.parseReminderTime(reminderParams[1])
 
                 priority =  ReminderPriorityParser.parseReminderPriority(
-                    from_ru_to_eng_reminder_priority(reminderParams[2])
+                    PriorityTranslator.from_ru_to_eng(reminderParams[2])
                 )
                 frequency = ReminderFrequencyParser.parseReminderFrequency(
-                    from_ru_to_eng_reminder_freq(reminderParams[3])
+                    FreqTranslator.from_ru_to_eng(reminderParams[3])
                 )
 
                 if not desc:

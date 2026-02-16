@@ -14,3 +14,5 @@ class ReminderFrequencyParser():
             return freq_enum
         except ValueError:
             return None
+
+    
