@@ -6,41 +6,22 @@ import re
 from app.parsers.from_ru_to_eng_reminder_parts import from_ru_to_eng_reminder_priority, from_ru_to_eng_reminder_freq
 from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
 from app.parsers.reminder_desc_parser import ReminderDescParser
+from app.parsers.reminder_freq_parser import ReminderFrequencyParser
 from app.parsers.reminder_priority_parser import ReminderPriorityParser
 
 # Parser income data
 class ReminderParser:
-    def __init__(self):
-        self._reminderDateTimeParser = ReminderDateTimeParser()
-        self._reminderDescParser = ReminderDescParser()
-        self._reminderPriorityParser = ReminderPriorityParser()
-    
-
-   
-
-    def parseReminderFrequency(self, freq: str):
-        if not freq or not isinstance(freq, str):
-            return None
-        
-        normalized = freq.strip().lower()
-        
-        try:
-            freq_enum = RepeatedValue(normalized)
-            return freq_enum
-        except ValueError:
-            return None
-
-
-    def parse(self, reminderText: str, telegram_id: int):
+    @staticmethod
+    def parse(reminderText: str, telegram_id: int):
         # /remind <текст> | <время> [| приоритет] [| повтор]
         reminderParams = reminderText.split("|")
         match (len(reminderParams)):
             case 2:
-                desc = self._reminderDescParser.parseReminderDescription(reminderParams[0])
+                desc = ReminderDescParser.parseReminderDescription(reminderParams[0])
                 if not desc:
                     raise ValueError(f"Invalid desc format: '{reminderParams[0]}'")
 
-                time = self._reminderDateTimeParser.parseReminderTime(reminderParams[1])
+                time = ReminderDateTimeParser.parseReminderTime(reminderParams[1])
 
                 if not time:
                     raise ValueError(f"Invalid time format: '{reminderParams[1]}'")
@@ -54,10 +35,10 @@ class ReminderParser:
                     repeated_value=RepeatedValue.ONCE
                 )
             case 3:
-                desc = self._reminderDescParser.parseReminderDescription(reminderParams[0])
-                time = self._reminderDateTimeParser.parseReminderTime(reminderParams[1])
+                desc = ReminderDescParser.parseReminderDescription(reminderParams[0])
+                time = ReminderDateTimeParser.parseReminderTime(reminderParams[1])
 
-                priority = self._reminderPriorityParser.parseReminderPriority(
+                priority = ReminderPriorityParser.parseReminderPriority(
                     from_ru_to_eng_reminder_priority(reminderParams[2])
                 )
 
@@ -69,7 +50,7 @@ class ReminderParser:
 
                 if priority is None:
 
-                    frequency = self.parseReminderFrequency(
+                    frequency = ReminderFrequencyParser.parseReminderFrequency(
                             from_ru_to_eng_reminder_freq(reminderParams[2])
                     )
        
@@ -93,13 +74,13 @@ class ReminderParser:
                         repeated_value=RepeatedValue.ONCE
                     )
             case 4:
-                desc = self._reminderDescParser.parseReminderDescription(reminderParams[0])
-                time = self._reminderDateTimeParser.parseReminderTime(reminderParams[1])
+                desc = ReminderDescParser.parseReminderDescription(reminderParams[0])
+                time = ReminderDateTimeParser.parseReminderTime(reminderParams[1])
 
-                priority =  self._reminderPriorityParser.parseReminderPriority(
+                priority =  ReminderPriorityParser.parseReminderPriority(
                     from_ru_to_eng_reminder_priority(reminderParams[2])
                 )
-                frequency = self.parseReminderFrequency(
+                frequency = ReminderFrequencyParser.parseReminderFrequency(
                     from_ru_to_eng_reminder_freq(reminderParams[3])
                 )
 

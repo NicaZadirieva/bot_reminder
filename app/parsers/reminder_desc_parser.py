@@ -1,3 +1,4 @@
 class ReminderDescParser():
-    def parseReminderDescription(self, description: str):
+    @staticmethod
+    def parseReminderDescription(description: str):
         return description.strip()

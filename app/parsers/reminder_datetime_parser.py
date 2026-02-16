@@ -5,7 +5,8 @@ import re
 
 
 class ReminderDateTimeParser:
-    def parseFmtDateTime(self, time: str, now: datetime) -> Optional[datetime]:
+    @staticmethod
+    def parseFmtDateTime(time: str, now: datetime) -> Optional[datetime]:
         # ============ ФОРМАТ 1: Конкретная дата с временем ============
         # Проверяем форматы с датой и временем
         if " " in time and ":" in time:
@@ -45,7 +46,8 @@ class ReminderDateTimeParser:
                     continue
         return None
 
-    def parseOnlyDateFmt(self, time: str) -> Optional[datetime]:
+    @staticmethod
+    def parseOnlyDateFmt(time: str) -> Optional[datetime]:
          # ============ ФОРМАТ 2: Только дата (без времени) ============
         # Проверяем форматы только даты
         date_only_formats = [
@@ -64,7 +66,8 @@ class ReminderDateTimeParser:
                 continue
         return None
 
-    def parseOnlyTimeFmt(self, time: str, now: datetime) -> Optional[datetime]:
+    @staticmethod
+    def parseOnlyTimeFmt(time: str, now: datetime) -> Optional[datetime]:
         if re.match(r"^\d{1,2}:\d{2}$", time):
             try:
                 hour, minute = map(int, time.split(":"))
@@ -83,7 +86,8 @@ class ReminderDateTimeParser:
                 return None
         return None
 
-    def parseOnlyTomorrow(self, time: str, now: datetime) -> Optional[datetime]:
+    @staticmethod
+    def parseOnlyTomorrow(time: str, now: datetime) -> Optional[datetime]:
         # ============ ФОРМАТ 4: Завтра ============
         if time.startswith("завтра"):
             tomorrow = now + timedelta(days=1)
@@ -101,7 +105,8 @@ class ReminderDateTimeParser:
                     return None
         return None
 
-    def parseRelativeDateTime(self, time: str, now: datetime) -> Optional[datetime]:
+    @staticmethod
+    def parseRelativeDateTime(time: str, now: datetime) -> Optional[datetime]:
         # ============ ФОРМАТ 5: Относительное время ============
         if time.startswith("через "):
             time_part = time.replace("через", "").strip()
@@ -123,8 +128,8 @@ class ReminderDateTimeParser:
         return None
     
     
-
-    def parseReminderTime(self, time: str) -> Optional[datetime]:
+    @staticmethod
+    def parseReminderTime(time: str) -> Optional[datetime]:
         """
         Парсит время напоминания и возвращает объект datetime.
     
@@ -143,28 +148,28 @@ class ReminderDateTimeParser:
     
         # ============ ФОРМАТ 1: Конкретная дата с временем ============
         # Проверяем форматы с датой и временем
-        fmtDatetime = self.parseFmtDateTime(time, now)
+        fmtDatetime = ReminderDateTimeParser.parseFmtDateTime(time, now)
         if fmtDatetime is not None:
             return fmtDatetime
     
         # ============ ФОРМАТ 2: Только дата (без времени) ============
         # Проверяем форматы только даты
-        onlyDateFmt = self.parseOnlyDateFmt(time)
+        onlyDateFmt = ReminderDateTimeParser.parseOnlyDateFmt(time)
         if onlyDateFmt is not None:
             return onlyDateFmt
     
         # ============ ФОРМАТ 3: Время дня (HH:MM) ============
-        onlyTimeFmt = self.parseOnlyTimeFmt(time, now)
+        onlyTimeFmt = ReminderDateTimeParser.parseOnlyTimeFmt(time, now)
         if onlyTimeFmt is not None:
             return onlyTimeFmt
 
         # ============ ФОРМАТ 4: Завтра ============
-        onlyTomorrow = self.parseOnlyTomorrow(time, now)
+        onlyTomorrow = ReminderDateTimeParser.parseOnlyTomorrow(time, now)
         if onlyTomorrow is not None:
             return onlyTomorrow
     
         # ============ ФОРМАТ 5: Относительное время ============
-        relativeDateTime = self.parseRelativeDateTime(time, now)
+        relativeDateTime = ReminderDateTimeParser.parseRelativeDateTime(time, now)
         if relativeDateTime is not None:
             return relativeDateTime
 
