@@ -46,7 +46,7 @@
     <Compile Include="app\database\connection.py" />
     <Compile Include="app\database\models.py" />
     <Compile Include="app\di_container.py" />
-    <Compile Include="app\entities\reminder.py" />
+    <Compile Include="app\entities\entities.py" />
     <Compile Include="app\dispatchers\reminder_dispatcher.py" />
     <Compile Include="app\mappers\from_entity_to_model.py" />
     <Compile Include="app\mappers\from_model_to_entity.py" />

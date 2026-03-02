@@ -1,5 +1,5 @@
 from typing import Optional
-from app.entities.reminder import Priority
+from app.entities import PriorityEntity
 from app.translators.TranslatorMixin import FromRuTranslatorMixin
 
 class ReminderPriorityParser(FromRuTranslatorMixin):
@@ -11,7 +11,7 @@ class ReminderPriorityParser(FromRuTranslatorMixin):
         normalized = priority.strip().lower()
         
         try:
-            priority_enum = Priority(normalized)
+            priority_enum = PriorityEntity(normalized)
             return priority_enum
         except ValueError:
             return None

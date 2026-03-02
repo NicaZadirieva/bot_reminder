@@ -1,5 +1,5 @@
 ﻿# Get all list of reminders
-from app.entities.reminder import Reminder
+from app.entities import ReminderEntity
 from app.services.reminder_service import ReminderService
 from .base import BotCommand
 from aiogram import types
@@ -12,7 +12,7 @@ class ListRemindersCommand(BotCommand):
         self.reminderService = reminderService
         super().__init__()
 
-    async def printAllReminders(self, reminders: List[Reminder], message: types.Message):
+    async def printAllReminders(self, reminders: List[ReminderEntity], message: types.Message):
         answer_text = []
         for reminder in reminders:
             answer_text.append(

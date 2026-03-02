@@ -6,8 +6,8 @@
 Полный набор unit и интеграционных тестов для парсера напоминаний
 """
 
-from app.entities.reminder import Priority, ReminderStatus, RepeatedValue
-from app.parsers.reminder_parser import ReminderParser
+from app.entities import PriorityEntity, StatusEntity, RepeatedValueEntity
+from app.parsers import ReminderParser
 import pytest
 
 # ============ ИНТЕГРАЦИОННЫЕ ТЕСТЫ ============
@@ -26,9 +26,9 @@ class TestReminderParserIntegration:
         assert result.remind_at.hour == 18
     
         # ✅ ПРАВИЛЬНО: Сравнивать с Enum объектами!
-        assert result.priority == Priority.MEDIUM
-        assert result.status == ReminderStatus.ACTIVE
-        assert result.repeated_value == RepeatedValue.ONCE
+        assert result.priority == PriorityEntity.MEDIUM
+        assert result.status == StatusEntity.ACTIVE
+        assert result.repeated_value == RepeatedValueEntity.ONCE
     
     def test_parse_example_2(self):
         """Встреча с командой | завтра 15:30"""
@@ -56,8 +56,8 @@ class TestReminderParserIntegration:
         assert result is not None
         assert result.text == "Рабочая встреча"
         assert result.remind_at.hour == 9
-        assert result.priority == Priority.HIGH
-        assert result.repeated_value == RepeatedValue.DAILY
+        assert result.priority == PriorityEntity.HIGH
+        assert result.repeated_value == RepeatedValueEntity.DAILY
     
     def test_parse_example_5(self):
         """Купить подарок | 2024-11-20 19:00 | MEDIUM | once"""
@@ -70,8 +70,8 @@ class TestReminderParserIntegration:
         assert result.remind_at.month == 11
         assert result.remind_at.day == 20
         assert result.remind_at.hour == 19
-        assert result.priority == Priority.MEDIUM
-        assert result.repeated_value == RepeatedValue.ONCE
+        assert result.priority == PriorityEntity.MEDIUM
+        assert result.repeated_value == RepeatedValueEntity.ONCE
     
     # ❌ НЕВАЛИДНЫЕ ФОРМАТЫ
     def test_parse_invalid_format(self):
@@ -86,7 +86,7 @@ class TestReminderParserIntegration:
         
         assert result is not None
         assert result.text == "Купить молоко"
-        assert result.priority == Priority.HIGH
+        assert result.priority == PriorityEntity.HIGH
     
     def test_parse_invalid_time_throws_error(self):
         """Невалидное время"""
