@@ -314,3 +314,27 @@ def test_create_daily_task_schedules_job(reminder_scheduler, sample_reminder_dai
 
         assert scheduler.reminders.get(sample_reminder_daily.id) == f'reminder_{sample_reminder_daily.id}'
 
+def test_create_weekly_task_schedules_job(reminder_scheduler, sample_reminder_weekly):
+    scheduler = reminder_scheduler
+    with freeze_time("2025-01-01 10:00:00"):
+        # Вызываем метод
+        method_name = '__create_weekly_task__'
+        create_weekly_task = getattr(scheduler, method_name)
+        create_weekly_task(sample_reminder_weekly)
+
+        # Проверяем вызов add_job
+        scheduler.scheduler.add_job.assert_called_once()
+        args, kwargs = scheduler.scheduler.add_job.call_args
+        func = args[0]
+        assert isinstance(func, partial)
+        assert func.func == scheduler.__send_reminder__
+        assert func.args == (sample_reminder_weekly,)
+        assert kwargs.get('trigger') == 'cron'
+        assert kwargs.get('day_of_week') == sample_reminder_weekly.remind_at.weekday()
+        assert kwargs.get('hour') == sample_reminder_weekly.remind_at.hour
+        assert kwargs.get('minute') == sample_reminder_weekly.remind_at.minute
+        assert kwargs.get('id') == f'reminder_{sample_reminder_weekly.id}'
+        assert kwargs.get('replace_existing') is True
+
+        assert scheduler.reminders.get(sample_reminder_weekly.id) == f'reminder_{sample_reminder_weekly.id}'
+
