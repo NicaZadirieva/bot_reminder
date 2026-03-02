@@ -50,6 +50,7 @@
     <Compile Include="app\parsers\reminder_freq_parser.py" />
     <Compile Include="app\parsers\reminder_parser.py" />
     <Compile Include="app\parsers\reminder_priority_parser.py" />
+    <Compile Include="app\tests\test_reminder_scheduler.py" />
     <Compile Include="app\translators\FreqTranslator.py" />
     <Compile Include="app\translators\PriorityTranslator.py" />
     <Compile Include="app\translators\StatusTranslator.py" />
