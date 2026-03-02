@@ -118,7 +118,7 @@ class ReminderScheduler:
                 
         self.scheduler.add_job(
             partial(self.__send_reminder__, reminder),
-            'date',
+            trigger = 'date',
             run_date=remind_at_aware,
             id=job_id,
             replace_existing=True
@@ -134,7 +134,7 @@ class ReminderScheduler:
         # ЕЖЕДНЕВНОЕ НАПОМИНАНИЕ (DAILY)
        self.scheduler.add_job(
            partial(self.__send_reminder__, reminder),
-           'cron',
+           trigger = 'cron',
            hour=reminder.remind_at.hour,
            minute=reminder.remind_at.minute,
            id=job_id,
@@ -152,7 +152,7 @@ class ReminderScheduler:
         job_id = f'reminder_{reminder.id}'
         self.scheduler.add_job(
              partial(self.__send_reminder__, reminder),
-             'cron',
+             trigger = 'cron',
              day_of_week=reminder.remind_at.weekday(),
              hour=reminder.remind_at.hour,
              minute=reminder.remind_at.minute,
@@ -181,7 +181,7 @@ class ReminderScheduler:
                 
         self.scheduler.add_job(
             partial(self.__send_reminder__, reminder),
-            'cron',
+            trigger = 'cron',
             day=day,
             hour=reminder.remind_at.hour,
             minute=reminder.remind_at.minute,
@@ -208,7 +208,7 @@ class ReminderScheduler:
             
          self.scheduler.add_job(
               partial(self.__send_reminder__, reminder),
-              'cron',
+              trigger = 'cron',
               month=month,
               day=day,
               hour=reminder.remind_at.hour,

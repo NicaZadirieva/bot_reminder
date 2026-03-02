@@ -6,6 +6,8 @@ from app.services.reminder_service import ReminderService
 from aiogram import Bot
 from app.entities.reminder import Reminder, ReminderStatus, RepeatedValue
 from datetime import datetime, timezone
+from freezegun import freeze_time
+from functools import partial
 
 @pytest.fixture
 def mock_reminder_service():
@@ -265,6 +267,28 @@ async def test_send_reminder(mocker,
     assert scheduler.bot.send_message.await_count == 5
     # проверка не изменился ли вызов
     assert mock_cancel_reminder.await_count == 1
+
+def test_create_once_task_schedules_job(mocker, reminder_scheduler, sample_reminder_once):
+    scheduler = reminder_scheduler
+    with freeze_time("2025-01-01 10:00:00"):
+        # Вызываем метод
+        method_name = '__create_once_task__'
+        create_once_task = getattr(scheduler, method_name)
+        create_once_task(sample_reminder_once)
+
+        # Проверяем вызов add_job
+        scheduler.scheduler.add_job.assert_called_once()
+        args, kwargs = scheduler.scheduler.add_job.call_args
+        func = args[0]
+        assert isinstance(func, partial)
+        assert func.func == scheduler.__send_reminder__
+        assert func.args == (sample_reminder_once,)
+        assert kwargs.get('trigger') == 'date'
+        assert kwargs.get('run_date') == sample_reminder_once.remind_at
+        assert kwargs.get('id') == f'reminder_{sample_reminder_once.id}'
+        assert kwargs.get('replace_existing') is True
+
+        assert scheduler.reminders.get(sample_reminder_once.id) == f'reminder_{sample_reminder_once.id}'
 
 
 
