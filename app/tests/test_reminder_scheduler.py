@@ -83,3 +83,7 @@ def sample_reminder_weekly():
         repeated_value=RepeatedValue.WEEKLY,
         status=ReminderStatus.ACTIVE
     )
+
+def test_init(reminder_scheduler):
+    scheduler = reminder_scheduler
+    assert scheduler.tz.zone == "Europe/Moscow"
