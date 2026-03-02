@@ -1,6 +1,5 @@
-import sched
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 from app.services.reminder_service import ReminderService
 from aiogram import Bot
 from app.entities.reminder import Reminder, ReminderStatus, RepeatedValue
@@ -134,3 +133,42 @@ async def test_stop_twice(reminder_scheduler):
 
     # проверка запуска 1 раз
     scheduler.scheduler.shutdown.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_load_reminders(
+    mocker,
+    mock_reminder_service,
+    reminder_scheduler,
+    sample_reminder_once,
+    sample_reminder_daily,
+    sample_reminder_weekly,
+    sample_reminder_monthly,
+    sample_reminder_yearly
+):
+    scheduler = reminder_scheduler
+    service = mock_reminder_service
+
+    # Мокаем schedule_reminder (асинхронный метод)
+    mock_schedule = mocker.patch.object(
+        scheduler, 
+        'schedule_reminder', 
+        new_callable=AsyncMock
+    )
+
+    # Настраиваем возврат активных напоминаний
+    reminders = [
+        sample_reminder_once,
+        sample_reminder_daily,
+        sample_reminder_weekly,
+        sample_reminder_monthly,
+        sample_reminder_yearly
+    ]
+    service.get_all_active_reminders.return_value = reminders
+
+    await scheduler.load_reminders()
+
+    assert mock_schedule.await_count == len(reminders)
+    mock_schedule.assert_has_awaits(
+        [mocker.call(r) for r in reminders], 
+        any_order=True
+    )
