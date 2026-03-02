@@ -1,3 +1,4 @@
+import sched
 import pytest
 from unittest.mock import AsyncMock, Mock, patch
 from app.services.reminder_service import ReminderService
@@ -87,3 +88,27 @@ def sample_reminder_weekly():
 def test_init(reminder_scheduler):
     scheduler = reminder_scheduler
     assert scheduler.tz.zone == "Europe/Moscow"
+
+@pytest.mark.asyncio
+async def test_start(reminder_scheduler):
+    scheduler = reminder_scheduler
+    scheduler.scheduler.running = False
+    scheduler.load_reminders = AsyncMock(return_value=None)
+
+    await scheduler.start()
+
+    scheduler.scheduler.start.assert_called_once()
+    scheduler.load_reminders.assert_awaited_once()
+
+@pytest.mark.asyncio
+async def test_start_twice(reminder_scheduler):
+    scheduler = reminder_scheduler
+    scheduler.scheduler.running = False
+    scheduler.load_reminders = AsyncMock(return_value=None)
+
+    await scheduler.start()
+    await scheduler.start()
+
+    # проверка запуска 1 раз
+    scheduler.scheduler.start.assert_called_once()
+    scheduler.load_reminders.assert_awaited_once()
