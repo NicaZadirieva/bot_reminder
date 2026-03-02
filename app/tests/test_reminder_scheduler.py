@@ -1,5 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, Mock
+
+from sqlalchemy.util.langhelpers import assert_arg_type
 from app.services.reminder_service import ReminderService
 from aiogram import Bot
 from app.entities.reminder import Reminder, ReminderStatus, RepeatedValue
@@ -172,3 +174,61 @@ async def test_load_reminders(
         [mocker.call(r) for r in reminders], 
         any_order=True
     )
+
+@pytest.mark.asyncio
+async def test_schedule_reminders(
+    mocker,
+    reminder_scheduler,
+    sample_reminder_once,
+    sample_reminder_daily,
+    sample_reminder_weekly,
+    sample_reminder_monthly,
+    sample_reminder_yearly
+):
+    scheduler = reminder_scheduler
+
+    # мок всех методов для создания таски
+    mock_create_once_task = mocker.patch.object(
+        scheduler, 
+        '__create_once_task__'
+    )
+
+    mock_create_daily_task = mocker.patch.object(
+        scheduler, 
+        '__create_daily_task__'
+    )
+
+    mock_create_weekly_task = mocker.patch.object(
+        scheduler, 
+        '__create_weekly_task__'
+    )
+
+    mock_create_monthly_task = mocker.patch.object(
+        scheduler, 
+        '__create_monthly_task__'
+    )
+
+    mock_create_yearly_task = mocker.patch.object(
+        scheduler, 
+        '__create_yearly_task__'
+    )
+
+    # Действия
+    await scheduler.schedule_reminder(sample_reminder_once)
+    await scheduler.schedule_reminder(sample_reminder_daily)
+    await scheduler.schedule_reminder(sample_reminder_weekly)
+    await scheduler.schedule_reminder(sample_reminder_monthly)
+    await scheduler.schedule_reminder(sample_reminder_yearly)
+
+    # Проверки
+    assert mock_create_once_task.call_count == 1
+    assert mock_create_daily_task.call_count == 1
+    assert mock_create_weekly_task.call_count == 1
+    assert mock_create_monthly_task.call_count == 1
+    assert mock_create_yearly_task.call_count == 1
+
+    mock_create_once_task.assert_has_calls([mocker.call(sample_reminder_once)])
+    mock_create_daily_task.assert_has_calls([mocker.call(sample_reminder_daily)])
+    mock_create_weekly_task.assert_has_calls([mocker.call(sample_reminder_weekly)])
+    mock_create_monthly_task.assert_has_calls([mocker.call(sample_reminder_monthly)])
+    mock_create_yearly_task.assert_has_calls([mocker.call(sample_reminder_yearly)])
