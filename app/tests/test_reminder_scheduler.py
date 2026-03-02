@@ -112,3 +112,25 @@ async def test_start_twice(reminder_scheduler):
     # проверка запуска 1 раз
     scheduler.scheduler.start.assert_called_once()
     scheduler.load_reminders.assert_awaited_once()
+
+@pytest.mark.asyncio
+async def test_stop(reminder_scheduler):
+    scheduler = reminder_scheduler
+    scheduler.scheduler.running = True
+    scheduler.load_reminders = AsyncMock(return_value=None)
+
+    await scheduler.shutdown()
+
+    scheduler.scheduler.shutdown.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_stop_twice(reminder_scheduler):
+    scheduler = reminder_scheduler
+    scheduler.scheduler.running = True
+    scheduler.load_reminders = AsyncMock(return_value=None)
+
+    await scheduler.shutdown()
+    await scheduler.shutdown()
+
+    # проверка запуска 1 раз
+    scheduler.scheduler.shutdown.assert_called_once()
