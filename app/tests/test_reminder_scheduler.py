@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, MagicMock
 
 from sqlalchemy.util.langhelpers import assert_arg_type
 from app.services.reminder_service import ReminderService
@@ -387,3 +387,79 @@ def test_create_yearly_task_schedules_job(reminder_scheduler, sample_reminder_ye
 
         assert scheduler.reminders.get(sample_reminder_yearly.id) == f'reminder_{sample_reminder_yearly.id}'
 
+@pytest.mark.asyncio
+async def test_cancel_reminder_job_success(
+    reminder_scheduler, 
+    sample_reminder_once
+):
+    scheduler = reminder_scheduler
+    reminder_id = sample_reminder_once.id
+    user_id = sample_reminder_once.telegram_id
+    job_id = f"reminder_{reminder_id}"
+
+    # Настраиваем сервис: напоминание существует
+    scheduler.reminderService.check_if_reminder_exists = AsyncMock(return_value=True)
+
+    # Добавляем запись в self.reminders
+    scheduler.reminders[reminder_id] = job_id
+
+    # Настраиваем мок планировщика: get_job возвращает что-то, чтобы remove_job вызвался
+    scheduler.scheduler.get_job = MagicMock(return_value=True)
+    scheduler.scheduler.remove_job = MagicMock()
+
+    # Действия
+    await scheduler.cancel_reminder_job(reminder_id, user_id)
+
+    # Проверяем вызов remove_job с правильным job_id
+    scheduler.scheduler.remove_job.assert_called_once_with(job_id)
+
+    # Проверяем, что запись удалена из self.reminders
+    assert reminder_id not in scheduler.reminders
+
+
+@pytest.mark.asyncio
+async def test_cancel_reminder_job_no_job_in_scheduler(
+    reminder_scheduler,
+    sample_reminder_once
+):
+    scheduler = reminder_scheduler
+    reminder_id = sample_reminder_once.id
+    user_id = sample_reminder_once.telegram_id
+    job_id = f"reminder_{reminder_id}"
+
+    scheduler.reminderService.check_if_reminder_exists = AsyncMock(return_value=True)
+
+    scheduler.reminders[reminder_id] = job_id
+    scheduler.scheduler.get_job = MagicMock(return_value=None)  # задания нет
+    scheduler.scheduler.remove_job = MagicMock()
+
+    # Действия
+    await scheduler.cancel_reminder_job(reminder_id, user_id)
+
+    # remove_job не должен вызываться, если get_job вернул None
+    scheduler.scheduler.remove_job.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_cancel_reminder_job_reminder_not_found(
+    reminder_scheduler,
+    sample_reminder_once
+):
+    scheduler = reminder_scheduler
+    reminder_id = sample_reminder_once.id
+    user_id = sample_reminder_once.telegram_id
+    job_id = f"reminder_{reminder_id}"
+
+    # Сервис говорит, что напоминания нет
+    scheduler.reminderService.check_if_reminder_exists = AsyncMock(return_value=False)
+
+    # Имитируем, что задание есть в reminders и планировщике (но оно не должно трогаться)
+    scheduler.reminders[reminder_id] = job_id
+    scheduler.scheduler.get_job = MagicMock(return_value=True)
+    scheduler.scheduler.remove_job = MagicMock()
+
+    with pytest.raises(Exception, match=f"Reminder with id={reminder_id} not found"):
+        await scheduler.cancel_reminder_job(reminder_id, user_id)
+
+    # Проверяем, что remove_job не вызывался
+    scheduler.scheduler.remove_job.assert_not_called()
