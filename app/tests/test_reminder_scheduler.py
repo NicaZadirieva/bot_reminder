@@ -362,3 +362,28 @@ def test_create_monthly_task_schedules_job(reminder_scheduler, sample_reminder_m
 
         assert scheduler.reminders.get(sample_reminder_monthly.id) == f'reminder_{sample_reminder_monthly.id}'
 
+def test_create_yearly_task_schedules_job(reminder_scheduler, sample_reminder_yearly):
+    scheduler = reminder_scheduler
+    with freeze_time("2025-01-01 10:00:00"):
+        # Вызываем метод
+        method_name = '__create_yearly_task__'
+        create_yearly_task = getattr(scheduler, method_name)
+        create_yearly_task(sample_reminder_yearly)
+
+        # Проверяем вызов add_job
+        scheduler.scheduler.add_job.assert_called_once()
+        args, kwargs = scheduler.scheduler.add_job.call_args
+        func = args[0]
+        assert isinstance(func, partial)
+        assert func.func == scheduler.__send_reminder__
+        assert func.args == (sample_reminder_yearly,)
+        assert kwargs.get('trigger') == 'cron'
+        assert kwargs.get('day') == sample_reminder_yearly.remind_at.day
+        assert kwargs.get('hour') == sample_reminder_yearly.remind_at.hour
+        assert kwargs.get('minute') == sample_reminder_yearly.remind_at.minute
+        assert kwargs.get('month') == sample_reminder_yearly.remind_at.month
+        assert kwargs.get('id') == f'reminder_{sample_reminder_yearly.id}'
+        assert kwargs.get('replace_existing') is True
+
+        assert scheduler.reminders.get(sample_reminder_yearly.id) == f'reminder_{sample_reminder_yearly.id}'
+
