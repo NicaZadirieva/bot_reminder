@@ -4,10 +4,9 @@ from aiogram import Router, types
 from aiogram.filters import Command
 from app.config import config
 from app.dispatchers.reminder_dispatcher import ReminderDispatcher
-from app.parsers.reminder_parser import ReminderParser
-from app.repositories.reminder_repository import ReminderRepository
+from app.repositories import ReminderRepository
 from app.services.reminder_service import ReminderService
-from app.database.connection import async_session
+from app.database import async_session
 from aiogram import Dispatcher, Bot
 from pathlib import Path
 
@@ -74,9 +73,8 @@ async def main():
         repo = ReminderRepository()
         reminderService = ReminderService(repo, session)
         remindScheduler = ReminderScheduler(reminderService, bot)
-        parser = ReminderParser()
         
-        reminderDispatcher = ReminderDispatcher(reminderService, parser, remindScheduler)
+        reminderDispatcher = ReminderDispatcher(reminderService, remindScheduler)
         router = Router()
 
         @router.message(Command(

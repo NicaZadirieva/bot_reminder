@@ -1,14 +1,11 @@
 ﻿ # Business logics
-from app.mappers.from_entity_to_model import from_entity_to_model
-from app.mappers.from_model_to_entity import from_model_to_entity
-from app.repositories.reminder_repository import ReminderRepository
+from app.mappers import from_entity_to_model, from_model_to_entity
+from app.repositories import ReminderRepository
 from typing import Any
 from typing import Optional, List, Any
-from datetime import datetime, timedelta, timezone as dt_timezone
-from pytz import timezone
 
-from app.entities.reminder import Reminder as ReminderEntity, ReminderStatus as ReminderStatusEntity, RepeatedValue as RepeatedValueEntity, Priority as PriorityEntity
-from app.database.models import Reminder as ReminderDb, RepeatedValue as RepeatedValueDb, Status as ReminderStatusDb, Priority as PriorityDb
+from app.entities import ReminderEntity
+from app.database import ReminderDb, RepeatedValueDb, StatusDb
 
 from app.utils.Utils import Utils
 import logging
@@ -34,13 +31,13 @@ class ReminderService:
         return self.filter_reminders_by_user(all_reminders, user_id)
 
     async def get_all_active_reminders(self) -> List[ReminderEntity]:
-        # 1️⃣ Получить ВСЕ напоминания
+        # 1️ Получить ВСЕ напоминания
         all_reminders = await self.reminderRepo.get_all(self.dbSession)
  
-        # 2️⃣ Отфильтровать АКТИВНЫЕ
-        active = [r for r in all_reminders if r.status == ReminderStatusDb.ACTIVE]
+        # 2️ Отфильтровать АКТИВНЫЕ
+        active = [r for r in all_reminders if r.status == StatusDb.ACTIVE]
             
-        # 3️⃣ Для ONCE - отфильтровать БУДУЩИЕ (не прошедшие)
+        # 3️ Для ONCE - отфильтровать БУДУЩИЕ (не прошедшие)
         now = Utils.get_now()
         to_schedule = [
                 r for r in active 
@@ -53,7 +50,7 @@ class ReminderService:
             reminderDb = await self.reminderRepo.update(
                self.dbSession,
                id,
-               status=ReminderStatusDb.CANCELLED
+               status=StatusDb.CANCELLED
             )
             return from_model_to_entity(reminderDb)
         else:
@@ -62,7 +59,7 @@ class ReminderService:
                 reminderDb = await self.reminderRepo.update(
                    self.dbSession,
                    id,
-                   status=ReminderStatusDb.CANCELLED
+                   status=StatusDb.CANCELLED
                 )
                 return from_model_to_entity(reminderDb)
             else:
