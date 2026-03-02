@@ -40,7 +40,6 @@ class ReminderScheduler:
             self.scheduler.start()
             logger.info("✅ Scheduler запущен")
             await self.load_reminders()
-            self.scheduler.running = True
 
     
 
@@ -49,7 +48,6 @@ class ReminderScheduler:
         if self.scheduler.running:
             self.scheduler.shutdown()
             logger.info("✅ Scheduler остановлен")
-            self.scheduler.running = False
 
 
     
