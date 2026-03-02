@@ -268,7 +268,7 @@ async def test_send_reminder(mocker,
     # проверка не изменился ли вызов
     assert mock_cancel_reminder.await_count == 1
 
-def test_create_once_task_schedules_job(mocker, reminder_scheduler, sample_reminder_once):
+def test_create_once_task_schedules_job(reminder_scheduler, sample_reminder_once):
     scheduler = reminder_scheduler
     with freeze_time("2025-01-01 10:00:00"):
         # Вызываем метод
@@ -291,4 +291,26 @@ def test_create_once_task_schedules_job(mocker, reminder_scheduler, sample_remin
         assert scheduler.reminders.get(sample_reminder_once.id) == f'reminder_{sample_reminder_once.id}'
 
 
+def test_create_daily_task_schedules_job(reminder_scheduler, sample_reminder_daily):
+    scheduler = reminder_scheduler
+    with freeze_time("2025-01-01 10:00:00"):
+        # Вызываем метод
+        method_name = '__create_daily_task__'
+        create_daily_task = getattr(scheduler, method_name)
+        create_daily_task(sample_reminder_daily)
+
+        # Проверяем вызов add_job
+        scheduler.scheduler.add_job.assert_called_once()
+        args, kwargs = scheduler.scheduler.add_job.call_args
+        func = args[0]
+        assert isinstance(func, partial)
+        assert func.func == scheduler.__send_reminder__
+        assert func.args == (sample_reminder_daily,)
+        assert kwargs.get('trigger') == 'cron'
+        assert kwargs.get('hour') == sample_reminder_daily.remind_at.hour
+        assert kwargs.get('minute') == sample_reminder_daily.remind_at.minute
+        assert kwargs.get('id') == f'reminder_{sample_reminder_daily.id}'
+        assert kwargs.get('replace_existing') is True
+
+        assert scheduler.reminders.get(sample_reminder_daily.id) == f'reminder_{sample_reminder_daily.id}'
 
