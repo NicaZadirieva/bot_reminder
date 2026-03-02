@@ -232,3 +232,39 @@ async def test_schedule_reminders(
     mock_create_weekly_task.assert_has_calls([mocker.call(sample_reminder_weekly)])
     mock_create_monthly_task.assert_has_calls([mocker.call(sample_reminder_monthly)])
     mock_create_yearly_task.assert_has_calls([mocker.call(sample_reminder_yearly)])
+
+@pytest.mark.asyncio
+async def test_send_reminder(mocker,
+    mock_reminder_service,
+    reminder_scheduler,
+    sample_reminder_once,
+    sample_reminder_daily,
+    sample_reminder_weekly,
+    sample_reminder_monthly,
+    sample_reminder_yearly):
+    scheduler = reminder_scheduler
+    service = mock_reminder_service
+
+    # мок вызова отмены напоминания
+    mock_cancel_reminder = mocker.patch.object(
+        service, 
+        'cancel_reminder_by_id',
+        new_callable=AsyncMock
+    )
+    # Действия
+    await scheduler.__send_reminder__(sample_reminder_once)
+    # Проверка, вызвана ли отмена
+    assert mock_cancel_reminder.await_count == 1
+
+    await scheduler.__send_reminder__(sample_reminder_daily)
+    await scheduler.__send_reminder__(sample_reminder_weekly)
+    await scheduler.__send_reminder__(sample_reminder_monthly)
+    await scheduler.__send_reminder__(sample_reminder_yearly)
+
+    # Проверки
+    assert scheduler.bot.send_message.await_count == 5
+    # проверка не изменился ли вызов
+    assert mock_cancel_reminder.await_count == 1
+
+
+
