@@ -1,11 +1,11 @@
-﻿from app.repositories.fake_repository import IFakeRepository
+﻿from .fake_repository import IFakeRepository
 from typing import Optional, List, Any
-from app.database.models import Reminder
+from app.database import ReminderDb
 
 from datetime import datetime, timedelta
 
-TEST_REMINDERS: List[Reminder] = [
-    Reminder(
+TEST_REMINDERS: List[ReminderDb] = [
+    ReminderDb(
         id =  1,
         telegram_id =  123456789,
         text = "Buy milk",
@@ -14,7 +14,7 @@ TEST_REMINDERS: List[Reminder] = [
         status =  "active",
         repeated_value = "once"
     ),
-    Reminder(
+    ReminderDb(
         id =  2,
         telegram_id =  123456789,
         text = "Call mom",
@@ -23,7 +23,7 @@ TEST_REMINDERS: List[Reminder] = [
         status =  "active",
         repeated_value = "once"
     ),
-    Reminder(
+    ReminderDb(
         id =  3,
         telegram_id =  123456789,
         text = "Deadline",
@@ -32,7 +32,7 @@ TEST_REMINDERS: List[Reminder] = [
         status =  "active",
         repeated_value = "once"
     ),
-    Reminder(
+    ReminderDb(
         id = 4,
         telegram_id =  123456789,
         text = "Meeting with friend",
@@ -41,7 +41,7 @@ TEST_REMINDERS: List[Reminder] = [
         status =  "completed",
         repeated_value = "once"
     ),
-    Reminder(
+    ReminderDb(
         id = 5,
         telegram_id =  123456789,
         text = "Buy order",
@@ -52,7 +52,7 @@ TEST_REMINDERS: List[Reminder] = [
     ),
     
     # jane_smith (telegram_id: 987654321)
-    Reminder(
+    ReminderDb(
         id = 6,
         telegram_id =  987654321,
         text = "Gym",
@@ -61,7 +61,7 @@ TEST_REMINDERS: List[Reminder] = [
         status =  "active",
         repeated_value = "once"
     ),
-    Reminder(
+    ReminderDb(
         id = 7,
         telegram_id =  987654321,
         text = "Birthday of my friend",
@@ -70,7 +70,7 @@ TEST_REMINDERS: List[Reminder] = [
         status =  "active",
         repeated_value = "once"
     ),
-    Reminder(
+    ReminderDb(
         id = 8,
         telegram_id =  987654321,
         text = "Buy gift",
@@ -80,7 +80,7 @@ TEST_REMINDERS: List[Reminder] = [
         repeated_value = "once"
     ),   
     # bob_wilson (telegram_id: 555666777)
-    Reminder(
+    ReminderDb(
         id = 9,
         telegram_id = 555666777,
         text = "Meeting in office",
@@ -95,24 +95,24 @@ TEST_REMINDERS: List[Reminder] = [
 class FakeReminderRepository(IFakeRepository):
     def __init__(self):
         super().__init__(Reminder)
-        self.storage: List[Reminder] = [r for r in TEST_REMINDERS]
+        self.storage: List[ReminderDb] = [r for r in TEST_REMINDERS]
         self.counter = max(r.id for r in self.storage) if self.storage else 0
 
-    async def get_by_id(self, session: Any, id: int) -> Optional[Reminder]:
+    async def get_by_id(self, session: Any, id: int) -> Optional[ReminderDb]:
         for reminder in self.storage:
             if reminder.id == id:
                 return reminder
         return None
     
-    async def get_all(self, session: Any) -> List[Reminder]:
+    async def get_all(self, session: Any) -> List[ReminderDb]:
         return self.storage.copy()
     
     
-    async def create(self, session: Any, obj: Reminder) -> Reminder:
+    async def create(self, session: Any, obj: ReminderDb) -> ReminderDb:
         self.counter += 1
         
-        if isinstance(obj, Reminder):
-            reminder = Reminder(
+        if isinstance(obj, ReminderDb):
+            reminder = ReminderDb(
                 id=self.counter,
                 telegram_id=obj.telegram_id,
                 text=obj.text,
@@ -122,7 +122,7 @@ class FakeReminderRepository(IFakeRepository):
                 repeated_value=obj.repeated_value
             )
         else:
-            reminder = Reminder(
+            reminder = ReminderDb(
                 id=self.counter,
                 telegram_id=obj.get("telegram_id"),
                 text=obj.get("text"),
@@ -135,7 +135,7 @@ class FakeReminderRepository(IFakeRepository):
         self.storage.append(reminder)
         return reminder
     
-    async def update(self, session: Any, id: int, **kwargs) -> Optional[Reminder]:
+    async def update(self, session: Any, id: int, **kwargs) -> Optional[ReminderDb]:
         for reminder in self.storage:
             if reminder.id == id:
                 for key, value in kwargs.items():

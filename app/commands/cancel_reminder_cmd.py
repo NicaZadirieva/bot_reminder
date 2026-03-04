@@ -1,4 +1,4 @@
-﻿# Cancel and not remind command
+﻿# Cancel to remind command
 from app.services.reminder_service import ReminderService
 from .base import BotCommand
 from aiogram import types

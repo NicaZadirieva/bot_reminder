@@ -1,4 +1,4 @@
-from app.repositories.base import IRepository
+from app.repositories import IRepository
 
 class IFakeRepository(IRepository):
     def __init__(self, model_class):

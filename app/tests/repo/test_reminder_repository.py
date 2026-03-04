@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from datetime import datetime, timedelta
-from app.repositories.fake_reminder_repository import FakeReminderRepository
+from .fake_reminder_repository import FakeReminderRepository
 
 
 @pytest.fixture
