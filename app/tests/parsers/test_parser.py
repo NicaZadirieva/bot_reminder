@@ -7,7 +7,7 @@
 """
 
 from app.domain.entities import PriorityEntity, StatusEntity, RepeatedValueEntity
-from app.parsers import ReminderParser
+from app.utils.parsers import ReminderParser
 import pytest
 
 # ============ ИНТЕГРАЦИОННЫЕ ТЕСТЫ ============

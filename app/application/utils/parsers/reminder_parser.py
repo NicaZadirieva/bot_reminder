@@ -5,12 +5,18 @@
     StatusEntity,
 )
 
-from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
-from app.parsers.reminder_desc_parser import ReminderDescParser
-from app.parsers.reminder_freq_parser import ReminderFrequencyParser
-from app.parsers.reminder_priority_parser import ReminderPriorityParser
-from app.utils.translators.PriorityTranslator import PriorityTranslator
-from app.utils.translators.FreqTranslator import FreqTranslator
+from app.application.utils.parsers.reminder_datetime_parser import (
+    ReminderDateTimeParser,
+)
+from app.application.utils.parsers.reminder_desc_parser import ReminderDescParser
+from app.application.utils.parsers.reminder_freq_parser import ReminderFrequencyParser
+from app.application.utils.parsers.reminder_priority_parser import (
+    ReminderPriorityParser,
+)
+from app.application.utils.translators.PriorityTranslator import (
+    PriorityTranslator,
+)
+from app.application.utils.translators.FreqTranslator import FreqTranslator
 
 
 # Parser income data

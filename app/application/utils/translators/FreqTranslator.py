@@ -1,4 +1,4 @@
-from app.utils.translators.TranslatorMixin import (
+from app.application.utils.translators.TranslatorMixin import (
     FromRuTranslatorMixin,
     FromEngTranslatorMixin,
 )

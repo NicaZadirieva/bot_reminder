@@ -1,4 +1,4 @@
-﻿from app.domain.entities import ReminderEntity, RepeatedValueEntity, StatusEntity
+﻿from app.domain.entities import ReminderEntity, RepeatedValueEntity
 from aiogram import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
@@ -6,7 +6,7 @@ import logging
 from functools import partial
 
 from app.application.services.reminder_service import ReminderService
-from app.utils.TimeUtils import TimeUtils
+from ..utils.TimeUtils import TimeUtils
 
 logger = logging.getLogger(__name__)
 

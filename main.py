@@ -3,13 +3,13 @@ import logging
 from pathlib import Path
 
 from aiogram import Bot
-from app.config import config
+from app.shared.config import config
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.presentation.telegram_bot_controller import TelegramBotController
 from app.infrastructure.repositories import ReminderRepository
 from app.application.services.reminder_service import ReminderService
 from app.infrastructure.database import async_session
-from app.schedulers.reminder_scheduler import ReminderScheduler
+from app.application.services.reminder_scheduler import ReminderScheduler
 
 # Если setup_logger остался в этом же файле, оставьте его здесь или импортируйте
 # from app.utils.logger import setup_logger

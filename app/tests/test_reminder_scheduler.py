@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import AsyncMock, Mock, MagicMock
 
 from sqlalchemy.util.langhelpers import assert_arg_type
-from app.services.reminder_service import ReminderService
+from app.application.services.reminder_service import ReminderService
 from aiogram import Bot
 from app.domain.entities import ReminderEntity, StatusEntity, RepeatedValueEntity
 from datetime import datetime, timezone
@@ -29,7 +29,7 @@ def mock_bot():
 
 @pytest.fixture
 def reminder_scheduler(mock_reminder_service: AsyncMock, mock_bot: AsyncMock):
-    from app.schedulers.reminder_scheduler import ReminderScheduler
+    from app.application.services.reminder_scheduler import ReminderScheduler
 
     scheduler = ReminderScheduler(mock_reminder_service, mock_bot)
     # Можно замокать scheduler внутри, чтобы не запускать реальные задачи

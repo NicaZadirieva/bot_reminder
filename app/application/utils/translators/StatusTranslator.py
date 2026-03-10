@@ -1,5 +1,5 @@
 from app.domain.entities import StatusEntity
-from app.utils.translators.TranslatorMixin import FromEngTranslatorMixin
+from app.application.utils.translators.TranslatorMixin import FromEngTranslatorMixin
 
 
 class StatusTranslator(FromEngTranslatorMixin):

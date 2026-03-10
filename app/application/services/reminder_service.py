@@ -1,5 +1,5 @@
 ﻿# Business logics
-from app.utils.mappers import from_entity_to_model, from_model_to_entity
+from app.application.utils.mappers import from_entity_to_model, from_model_to_entity
 from app.infrastructure.repositories import ReminderRepository
 from typing import Any
 from typing import Optional, List, Any
@@ -7,7 +7,7 @@ from typing import Optional, List, Any
 from app.domain.entities import ReminderEntity
 from app.infrastructure.database import ReminderDb, RepeatedValueDb, StatusDb
 
-from app.utils.TimeUtils import TimeUtils
+from app.application.utils.TimeUtils import TimeUtils
 import logging
 
 logger = logging.getLogger(__name__)

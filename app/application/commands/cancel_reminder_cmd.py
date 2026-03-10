@@ -1,6 +1,6 @@
 ﻿from .base import CommandUseCase
 from app.application.services.reminder_service import ReminderService
-from app.schedulers.reminder_scheduler import ReminderScheduler
+from app.application.services.reminder_scheduler import ReminderScheduler
 
 
 class CancelReminderCommand(CommandUseCase):

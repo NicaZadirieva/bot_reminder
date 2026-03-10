@@ -1,6 +1,8 @@
 from typing import Optional
 from app.domain.entities import PriorityEntity
-from app.utils.translators.TranslatorMixin import FromRuTranslatorMixin
+from app.application.utils.translators.TranslatorMixin import (
+    FromRuTranslatorMixin,
+)
 
 
 class ReminderPriorityParser(FromRuTranslatorMixin):
