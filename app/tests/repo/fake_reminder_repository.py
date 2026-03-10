@@ -6,89 +6,88 @@ from datetime import datetime, timedelta
 
 TEST_REMINDERS: List[ReminderDb] = [
     ReminderDb(
-        id =  1,
-        telegram_id =  123456789,
-        text = "Buy milk",
-        remind_at = datetime.now() + timedelta(hours=2),
-        priority =  "high",
-        status =  "active",
-        repeated_value = "once"
+        id=1,
+        telegram_id=123456789,
+        text="Buy milk",
+        remind_at=datetime.now() + timedelta(hours=2),
+        priority="high",
+        status="active",
+        repeated_value="once",
     ),
     ReminderDb(
-        id =  2,
-        telegram_id =  123456789,
-        text = "Call mom",
-        remind_at = datetime.now() + timedelta(days=1),
-        priority =  "medium",
-        status =  "active",
-        repeated_value = "once"
+        id=2,
+        telegram_id=123456789,
+        text="Call mom",
+        remind_at=datetime.now() + timedelta(days=1),
+        priority="medium",
+        status="active",
+        repeated_value="once",
     ),
     ReminderDb(
-        id =  3,
-        telegram_id =  123456789,
-        text = "Deadline",
-        remind_at = datetime.now() + timedelta(days=7),
-        priority =  "high",
-        status =  "active",
-        repeated_value = "once"
+        id=3,
+        telegram_id=123456789,
+        text="Deadline",
+        remind_at=datetime.now() + timedelta(days=7),
+        priority="high",
+        status="active",
+        repeated_value="once",
     ),
     ReminderDb(
-        id = 4,
-        telegram_id =  123456789,
-        text = "Meeting with friend",
-        remind_at = datetime.now() + timedelta(hours=3),
-        priority =  "medium",
-        status =  "completed",
-        repeated_value = "once"
+        id=4,
+        telegram_id=123456789,
+        text="Meeting with friend",
+        remind_at=datetime.now() + timedelta(hours=3),
+        priority="medium",
+        status="completed",
+        repeated_value="once",
     ),
     ReminderDb(
-        id = 5,
-        telegram_id =  123456789,
-        text = "Buy order",
-        remind_at = datetime.now() - timedelta(hours=1),
-        priority =  "high",
-        status =  "cancelled",
-        repeated_value = "once"
+        id=5,
+        telegram_id=123456789,
+        text="Buy order",
+        remind_at=datetime.now() - timedelta(hours=1),
+        priority="high",
+        status="cancelled",
+        repeated_value="once",
     ),
-    
     # jane_smith (telegram_id: 987654321)
     ReminderDb(
-        id = 6,
-        telegram_id =  987654321,
-        text = "Gym",
-        remind_at = datetime.now() + timedelta(hours=1),
-        priority =  "medium",
-        status =  "active",
-        repeated_value = "once"
+        id=6,
+        telegram_id=987654321,
+        text="Gym",
+        remind_at=datetime.now() + timedelta(hours=1),
+        priority="medium",
+        status="active",
+        repeated_value="once",
     ),
     ReminderDb(
-        id = 7,
-        telegram_id =  987654321,
-        text = "Birthday of my friend",
-        remind_at = datetime.now() + timedelta(days=14),
-        priority =  "high",
-        status =  "active",
-        repeated_value = "once"
+        id=7,
+        telegram_id=987654321,
+        text="Birthday of my friend",
+        remind_at=datetime.now() + timedelta(days=14),
+        priority="high",
+        status="active",
+        repeated_value="once",
     ),
     ReminderDb(
-        id = 8,
-        telegram_id =  987654321,
-        text = "Buy gift",
-        remind_at = datetime.now() + timedelta(days=13),
-        priority =  "medium",
-        status =  "active",
-        repeated_value = "once"
-    ),   
+        id=8,
+        telegram_id=987654321,
+        text="Buy gift",
+        remind_at=datetime.now() + timedelta(days=13),
+        priority="medium",
+        status="active",
+        repeated_value="once",
+    ),
     # bob_wilson (telegram_id: 555666777)
     ReminderDb(
-        id = 9,
-        telegram_id = 555666777,
-        text = "Meeting in office",
-        remind_at = datetime.now() + timedelta(hours=4),
-        priority =  "high",
-        status =  "active",
-        repeated_value = "once"
-    )
+        id=9,
+        telegram_id=555666777,
+        text="Meeting in office",
+        remind_at=datetime.now() + timedelta(hours=4),
+        priority="high",
+        status="active",
+        repeated_value="once",
+    ),
 ]
 
 
@@ -103,14 +102,13 @@ class FakeReminderRepository(IFakeRepository):
             if reminder.id == id:
                 return reminder
         return None
-    
+
     async def get_all(self, session: Any) -> List[ReminderDb]:
         return self.storage.copy()
-    
-    
+
     async def create(self, session: Any, obj: ReminderDb) -> ReminderDb:
         self.counter += 1
-        
+
         if isinstance(obj, ReminderDb):
             reminder = ReminderDb(
                 id=self.counter,
@@ -119,7 +117,7 @@ class FakeReminderRepository(IFakeRepository):
                 remind_at=obj.remind_at,
                 priority=obj.priority,
                 status=obj.status,
-                repeated_value=obj.repeated_value
+                repeated_value=obj.repeated_value,
             )
         else:
             reminder = ReminderDb(
@@ -129,12 +127,12 @@ class FakeReminderRepository(IFakeRepository):
                 remind_at=obj.get("remind_at"),
                 priority=obj.get("priority"),
                 status=obj.get("status"),
-                repeated_value=obj.get("repeated_value")
+                repeated_value=obj.get("repeated_value"),
             )
-        
+
         self.storage.append(reminder)
         return reminder
-    
+
     async def update(self, session: Any, id: int, **kwargs) -> Optional[ReminderDb]:
         for reminder in self.storage:
             if reminder.id == id:
@@ -149,10 +147,3 @@ class FakeReminderRepository(IFakeRepository):
                 self.storage.pop(i)
                 return True
         return False
-
-    async def get_by_telegram_id(self, session: Any, telegram_id: int):
-        reminders = []
-        for reminder in self.storage:
-            if reminder.telegram_id == telegram_id:
-                reminders.append(reminder)
-        return reminders

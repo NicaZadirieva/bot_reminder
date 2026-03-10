@@ -1,5 +1,5 @@
 # Reminder-specific repository
-from app.repositories.postgres_repository import PostgresRepository
+from .postgres_repository import PostgresRepository
 from app.database import ReminderDb
 
 

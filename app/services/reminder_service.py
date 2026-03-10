@@ -1,6 +1,6 @@
 ﻿# Business logics
 from app.mappers import from_entity_to_model, from_model_to_entity
-from app.repositories import ReminderRepository
+from app.infrastructure.repositories import ReminderRepository
 from typing import Any
 from typing import Optional, List, Any
 

@@ -12,10 +12,6 @@ class IRepository(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    async def get_by_telegram_id(self, session, telegram_id: int) -> Optional[T]:
-        pass
-
-    @abstractmethod
     async def get_all(self, session) -> List[T]:
         pass
 
