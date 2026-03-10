@@ -1,5 +1,5 @@
 ﻿# Get all list of reminders
-from app.entities import ReminderEntity
+from app.domain.entities import ReminderEntity
 from app.services.reminder_service import ReminderService
 from .base import BotCommand
 from aiogram import types
@@ -7,24 +7,30 @@ from app.translators.StatusTranslator import StatusTranslator
 from app.translators.FreqTranslator import FreqTranslator
 from typing import List
 
+
 class ListRemindersCommand(BotCommand):
     def __init__(self, reminderService: ReminderService):
         self.reminderService = reminderService
         super().__init__()
 
-    async def printAllReminders(self, reminders: List[ReminderEntity], message: types.Message):
+    async def printAllReminders(
+        self, reminders: List[ReminderEntity], message: types.Message
+    ):
         answer_text = []
         for reminder in reminders:
             answer_text.append(
-                "\n".join([
-                f"#{reminder.id} 📝 {reminder.text}",
-                f"⏰ {reminder.remind_at}",
-                f"🔔 {StatusTranslator.from_eng_to_ru(reminder.status)} | 🔄 {FreqTranslator.eng_to_ru(reminder.repeated_value)}"])
+                "\n".join(
+                    [
+                        f"#{reminder.id} 📝 {reminder.text}",
+                        f"⏰ {reminder.remind_at}",
+                        f"🔔 {StatusTranslator.from_eng_to_ru(reminder.status)} | 🔄 {FreqTranslator.eng_to_ru(reminder.repeated_value)}",
+                    ]
+                )
             )
         if len(answer_text) > 0:
             await message.answer("\n\n".join(answer_text))
         else:
-            await message.answer('Нет напоминаний')
+            await message.answer("Нет напоминаний")
 
     async def execute(self, message: types.Message):
         reminders = await self.reminderService.get_all_reminders(message.from_user.id)

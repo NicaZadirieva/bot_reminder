@@ -4,10 +4,11 @@ from unittest.mock import AsyncMock, Mock, MagicMock
 from sqlalchemy.util.langhelpers import assert_arg_type
 from app.services.reminder_service import ReminderService
 from aiogram import Bot
-from app.entities import ReminderEntity, StatusEntity, RepeatedValueEntity
+from app.domain.entities import ReminderEntity, StatusEntity, RepeatedValueEntity
 from datetime import datetime, timezone
 from freezegun import freeze_time
 from functools import partial
+
 
 @pytest.fixture
 def mock_reminder_service():
@@ -18,20 +19,24 @@ def mock_reminder_service():
     service.cancel_reminder_by_id = AsyncMock()
     return service
 
+
 @pytest.fixture
 def mock_bot():
     bot = AsyncMock(spec=Bot)
     bot.send_message = AsyncMock()
     return bot
 
+
 @pytest.fixture
 def reminder_scheduler(mock_reminder_service: AsyncMock, mock_bot: AsyncMock):
     from app.schedulers.reminder_scheduler import ReminderScheduler
+
     scheduler = ReminderScheduler(mock_reminder_service, mock_bot)
     # Можно замокать scheduler внутри, чтобы не запускать реальные задачи
     scheduler.scheduler = AsyncMock()
     scheduler.scheduler.running = False
     return scheduler
+
 
 @pytest.fixture
 def sample_reminder_once():
@@ -41,8 +46,9 @@ def sample_reminder_once():
         text="Test reminder",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValueEntity.ONCE,
-        status=StatusEntity.ACTIVE
+        status=StatusEntity.ACTIVE,
     )
+
 
 @pytest.fixture
 def sample_reminder_daily():
@@ -52,8 +58,9 @@ def sample_reminder_daily():
         text="Test reminder daily",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValueEntity.DAILY,
-        status=StatusEntity.ACTIVE
+        status=StatusEntity.ACTIVE,
     )
+
 
 @pytest.fixture
 def sample_reminder_yearly():
@@ -63,8 +70,9 @@ def sample_reminder_yearly():
         text="Test reminder yearly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValueEntity.YEARLY,
-        status=StatusEntity.ACTIVE
+        status=StatusEntity.ACTIVE,
     )
+
 
 @pytest.fixture
 def sample_reminder_monthly():
@@ -74,8 +82,9 @@ def sample_reminder_monthly():
         text="Test reminder monthly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValueEntity.MONTHLY,
-        status=StatusEntity.ACTIVE
+        status=StatusEntity.ACTIVE,
     )
+
 
 @pytest.fixture
 def sample_reminder_weekly():
@@ -85,12 +94,14 @@ def sample_reminder_weekly():
         text="Test reminder weekly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValueEntity.WEEKLY,
-        status=StatusEntity.ACTIVE
+        status=StatusEntity.ACTIVE,
     )
+
 
 def test_init(reminder_scheduler):
     scheduler = reminder_scheduler
     assert scheduler.tz.zone == "Europe/Moscow"
+
 
 @pytest.mark.asyncio
 async def test_start(reminder_scheduler):
@@ -114,6 +125,7 @@ async def test_stop(reminder_scheduler):
 
     scheduler.scheduler.shutdown.assert_called_once()
 
+
 @pytest.mark.asyncio
 async def test_load_reminders(
     mocker,
@@ -123,16 +135,14 @@ async def test_load_reminders(
     sample_reminder_daily,
     sample_reminder_weekly,
     sample_reminder_monthly,
-    sample_reminder_yearly
+    sample_reminder_yearly,
 ):
     scheduler = reminder_scheduler
     service = mock_reminder_service
 
     # Мокаем schedule_reminder (асинхронный метод)
     mock_schedule = mocker.patch.object(
-        scheduler, 
-        'schedule_reminder', 
-        new_callable=AsyncMock
+        scheduler, "schedule_reminder", new_callable=AsyncMock
     )
 
     # Настраиваем возврат активных напоминаний
@@ -141,17 +151,15 @@ async def test_load_reminders(
         sample_reminder_daily,
         sample_reminder_weekly,
         sample_reminder_monthly,
-        sample_reminder_yearly
+        sample_reminder_yearly,
     ]
     service.get_all_active_reminders.return_value = reminders
 
     await scheduler.load_reminders()
 
     assert mock_schedule.await_count == len(reminders)
-    mock_schedule.assert_has_awaits(
-        [mocker.call(r) for r in reminders], 
-        any_order=True
-    )
+    mock_schedule.assert_has_awaits([mocker.call(r) for r in reminders], any_order=True)
+
 
 @pytest.mark.asyncio
 async def test_schedule_reminders(
@@ -161,35 +169,20 @@ async def test_schedule_reminders(
     sample_reminder_daily,
     sample_reminder_weekly,
     sample_reminder_monthly,
-    sample_reminder_yearly
+    sample_reminder_yearly,
 ):
     scheduler = reminder_scheduler
 
     # мок всех методов для создания таски
-    mock_create_once_task = mocker.patch.object(
-        scheduler, 
-        '__create_once_task__'
-    )
+    mock_create_once_task = mocker.patch.object(scheduler, "__create_once_task__")
 
-    mock_create_daily_task = mocker.patch.object(
-        scheduler, 
-        '__create_daily_task__'
-    )
+    mock_create_daily_task = mocker.patch.object(scheduler, "__create_daily_task__")
 
-    mock_create_weekly_task = mocker.patch.object(
-        scheduler, 
-        '__create_weekly_task__'
-    )
+    mock_create_weekly_task = mocker.patch.object(scheduler, "__create_weekly_task__")
 
-    mock_create_monthly_task = mocker.patch.object(
-        scheduler, 
-        '__create_monthly_task__'
-    )
+    mock_create_monthly_task = mocker.patch.object(scheduler, "__create_monthly_task__")
 
-    mock_create_yearly_task = mocker.patch.object(
-        scheduler, 
-        '__create_yearly_task__'
-    )
+    mock_create_yearly_task = mocker.patch.object(scheduler, "__create_yearly_task__")
 
     # Действия
     await scheduler.schedule_reminder(sample_reminder_once)
@@ -211,23 +204,24 @@ async def test_schedule_reminders(
     mock_create_monthly_task.assert_has_calls([mocker.call(sample_reminder_monthly)])
     mock_create_yearly_task.assert_has_calls([mocker.call(sample_reminder_yearly)])
 
+
 @pytest.mark.asyncio
-async def test_send_reminder(mocker,
+async def test_send_reminder(
+    mocker,
     mock_reminder_service,
     reminder_scheduler,
     sample_reminder_once,
     sample_reminder_daily,
     sample_reminder_weekly,
     sample_reminder_monthly,
-    sample_reminder_yearly):
+    sample_reminder_yearly,
+):
     scheduler = reminder_scheduler
     service = mock_reminder_service
 
     # мок вызова отмены напоминания
     mock_cancel_reminder = mocker.patch.object(
-        service, 
-        'cancel_reminder_by_id',
-        new_callable=AsyncMock
+        service, "cancel_reminder_by_id", new_callable=AsyncMock
     )
     # Действия
     await scheduler.__send_reminder__(sample_reminder_once)
@@ -244,11 +238,12 @@ async def test_send_reminder(mocker,
     # проверка не изменился ли вызов
     assert mock_cancel_reminder.await_count == 1
 
+
 def test_create_once_task_schedules_job(reminder_scheduler, sample_reminder_once):
     scheduler = reminder_scheduler
     with freeze_time("2025-01-01 10:00:00"):
         # Вызываем метод
-        method_name = '__create_once_task__'
+        method_name = "__create_once_task__"
         create_once_task = getattr(scheduler, method_name)
         create_once_task(sample_reminder_once)
 
@@ -259,19 +254,22 @@ def test_create_once_task_schedules_job(reminder_scheduler, sample_reminder_once
         assert isinstance(func, partial)
         assert func.func == scheduler.__send_reminder__
         assert func.args == (sample_reminder_once,)
-        assert kwargs.get('trigger') == 'date'
-        assert kwargs.get('run_date') == sample_reminder_once.remind_at
-        assert kwargs.get('id') == f'reminder_{sample_reminder_once.id}'
-        assert kwargs.get('replace_existing') is True
+        assert kwargs.get("trigger") == "date"
+        assert kwargs.get("run_date") == sample_reminder_once.remind_at
+        assert kwargs.get("id") == f"reminder_{sample_reminder_once.id}"
+        assert kwargs.get("replace_existing") is True
 
-        assert scheduler.reminders.get(sample_reminder_once.id) == f'reminder_{sample_reminder_once.id}'
+        assert (
+            scheduler.reminders.get(sample_reminder_once.id)
+            == f"reminder_{sample_reminder_once.id}"
+        )
 
 
 def test_create_daily_task_schedules_job(reminder_scheduler, sample_reminder_daily):
     scheduler = reminder_scheduler
     with freeze_time("2025-01-01 10:00:00"):
         # Вызываем метод
-        method_name = '__create_daily_task__'
+        method_name = "__create_daily_task__"
         create_daily_task = getattr(scheduler, method_name)
         create_daily_task(sample_reminder_daily)
 
@@ -282,19 +280,23 @@ def test_create_daily_task_schedules_job(reminder_scheduler, sample_reminder_dai
         assert isinstance(func, partial)
         assert func.func == scheduler.__send_reminder__
         assert func.args == (sample_reminder_daily,)
-        assert kwargs.get('trigger') == 'cron'
-        assert kwargs.get('hour') == sample_reminder_daily.remind_at.hour
-        assert kwargs.get('minute') == sample_reminder_daily.remind_at.minute
-        assert kwargs.get('id') == f'reminder_{sample_reminder_daily.id}'
-        assert kwargs.get('replace_existing') is True
+        assert kwargs.get("trigger") == "cron"
+        assert kwargs.get("hour") == sample_reminder_daily.remind_at.hour
+        assert kwargs.get("minute") == sample_reminder_daily.remind_at.minute
+        assert kwargs.get("id") == f"reminder_{sample_reminder_daily.id}"
+        assert kwargs.get("replace_existing") is True
 
-        assert scheduler.reminders.get(sample_reminder_daily.id) == f'reminder_{sample_reminder_daily.id}'
+        assert (
+            scheduler.reminders.get(sample_reminder_daily.id)
+            == f"reminder_{sample_reminder_daily.id}"
+        )
+
 
 def test_create_weekly_task_schedules_job(reminder_scheduler, sample_reminder_weekly):
     scheduler = reminder_scheduler
     with freeze_time("2025-01-01 10:00:00"):
         # Вызываем метод
-        method_name = '__create_weekly_task__'
+        method_name = "__create_weekly_task__"
         create_weekly_task = getattr(scheduler, method_name)
         create_weekly_task(sample_reminder_weekly)
 
@@ -305,20 +307,24 @@ def test_create_weekly_task_schedules_job(reminder_scheduler, sample_reminder_we
         assert isinstance(func, partial)
         assert func.func == scheduler.__send_reminder__
         assert func.args == (sample_reminder_weekly,)
-        assert kwargs.get('trigger') == 'cron'
-        assert kwargs.get('day_of_week') == sample_reminder_weekly.remind_at.weekday()
-        assert kwargs.get('hour') == sample_reminder_weekly.remind_at.hour
-        assert kwargs.get('minute') == sample_reminder_weekly.remind_at.minute
-        assert kwargs.get('id') == f'reminder_{sample_reminder_weekly.id}'
-        assert kwargs.get('replace_existing') is True
+        assert kwargs.get("trigger") == "cron"
+        assert kwargs.get("day_of_week") == sample_reminder_weekly.remind_at.weekday()
+        assert kwargs.get("hour") == sample_reminder_weekly.remind_at.hour
+        assert kwargs.get("minute") == sample_reminder_weekly.remind_at.minute
+        assert kwargs.get("id") == f"reminder_{sample_reminder_weekly.id}"
+        assert kwargs.get("replace_existing") is True
 
-        assert scheduler.reminders.get(sample_reminder_weekly.id) == f'reminder_{sample_reminder_weekly.id}'
+        assert (
+            scheduler.reminders.get(sample_reminder_weekly.id)
+            == f"reminder_{sample_reminder_weekly.id}"
+        )
+
 
 def test_create_monthly_task_schedules_job(reminder_scheduler, sample_reminder_monthly):
     scheduler = reminder_scheduler
     with freeze_time("2025-01-01 10:00:00"):
         # Вызываем метод
-        method_name = '__create_monthly_task__'
+        method_name = "__create_monthly_task__"
         create_monthly_task = getattr(scheduler, method_name)
         create_monthly_task(sample_reminder_monthly)
 
@@ -329,20 +335,24 @@ def test_create_monthly_task_schedules_job(reminder_scheduler, sample_reminder_m
         assert isinstance(func, partial)
         assert func.func == scheduler.__send_reminder__
         assert func.args == (sample_reminder_monthly,)
-        assert kwargs.get('trigger') == 'cron'
-        assert kwargs.get('day') == sample_reminder_monthly.remind_at.day
-        assert kwargs.get('hour') == sample_reminder_monthly.remind_at.hour
-        assert kwargs.get('minute') == sample_reminder_monthly.remind_at.minute
-        assert kwargs.get('id') == f'reminder_{sample_reminder_monthly.id}'
-        assert kwargs.get('replace_existing') is True
+        assert kwargs.get("trigger") == "cron"
+        assert kwargs.get("day") == sample_reminder_monthly.remind_at.day
+        assert kwargs.get("hour") == sample_reminder_monthly.remind_at.hour
+        assert kwargs.get("minute") == sample_reminder_monthly.remind_at.minute
+        assert kwargs.get("id") == f"reminder_{sample_reminder_monthly.id}"
+        assert kwargs.get("replace_existing") is True
 
-        assert scheduler.reminders.get(sample_reminder_monthly.id) == f'reminder_{sample_reminder_monthly.id}'
+        assert (
+            scheduler.reminders.get(sample_reminder_monthly.id)
+            == f"reminder_{sample_reminder_monthly.id}"
+        )
+
 
 def test_create_yearly_task_schedules_job(reminder_scheduler, sample_reminder_yearly):
     scheduler = reminder_scheduler
     with freeze_time("2025-01-01 10:00:00"):
         # Вызываем метод
-        method_name = '__create_yearly_task__'
+        method_name = "__create_yearly_task__"
         create_yearly_task = getattr(scheduler, method_name)
         create_yearly_task(sample_reminder_yearly)
 
@@ -353,21 +363,22 @@ def test_create_yearly_task_schedules_job(reminder_scheduler, sample_reminder_ye
         assert isinstance(func, partial)
         assert func.func == scheduler.__send_reminder__
         assert func.args == (sample_reminder_yearly,)
-        assert kwargs.get('trigger') == 'cron'
-        assert kwargs.get('day') == sample_reminder_yearly.remind_at.day
-        assert kwargs.get('hour') == sample_reminder_yearly.remind_at.hour
-        assert kwargs.get('minute') == sample_reminder_yearly.remind_at.minute
-        assert kwargs.get('month') == sample_reminder_yearly.remind_at.month
-        assert kwargs.get('id') == f'reminder_{sample_reminder_yearly.id}'
-        assert kwargs.get('replace_existing') is True
+        assert kwargs.get("trigger") == "cron"
+        assert kwargs.get("day") == sample_reminder_yearly.remind_at.day
+        assert kwargs.get("hour") == sample_reminder_yearly.remind_at.hour
+        assert kwargs.get("minute") == sample_reminder_yearly.remind_at.minute
+        assert kwargs.get("month") == sample_reminder_yearly.remind_at.month
+        assert kwargs.get("id") == f"reminder_{sample_reminder_yearly.id}"
+        assert kwargs.get("replace_existing") is True
 
-        assert scheduler.reminders.get(sample_reminder_yearly.id) == f'reminder_{sample_reminder_yearly.id}'
+        assert (
+            scheduler.reminders.get(sample_reminder_yearly.id)
+            == f"reminder_{sample_reminder_yearly.id}"
+        )
+
 
 @pytest.mark.asyncio
-async def test_cancel_reminder_job_success(
-    reminder_scheduler, 
-    sample_reminder_once
-):
+async def test_cancel_reminder_job_success(reminder_scheduler, sample_reminder_once):
     scheduler = reminder_scheduler
     reminder_id = sample_reminder_once.id
     user_id = sample_reminder_once.telegram_id
@@ -395,8 +406,7 @@ async def test_cancel_reminder_job_success(
 
 @pytest.mark.asyncio
 async def test_cancel_reminder_job_no_job_in_scheduler(
-    reminder_scheduler,
-    sample_reminder_once
+    reminder_scheduler, sample_reminder_once
 ):
     scheduler = reminder_scheduler
     reminder_id = sample_reminder_once.id
@@ -418,8 +428,7 @@ async def test_cancel_reminder_job_no_job_in_scheduler(
 
 @pytest.mark.asyncio
 async def test_cancel_reminder_job_reminder_not_found(
-    reminder_scheduler,
-    sample_reminder_once
+    reminder_scheduler, sample_reminder_once
 ):
     scheduler = reminder_scheduler
     reminder_id = sample_reminder_once.id

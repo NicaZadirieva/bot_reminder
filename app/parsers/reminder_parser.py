@@ -1,4 +1,9 @@
-﻿from app.entities import ReminderEntity, PriorityEntity, RepeatedValueEntity, StatusEntity
+﻿from app.domain.entities import (
+    ReminderEntity,
+    PriorityEntity,
+    RepeatedValueEntity,
+    StatusEntity,
+)
 
 from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
 from app.parsers.reminder_desc_parser import ReminderDescParser
@@ -7,13 +12,14 @@ from app.parsers.reminder_priority_parser import ReminderPriorityParser
 from app.translators.PriorityTranslator import PriorityTranslator
 from app.translators.FreqTranslator import FreqTranslator
 
+
 # Parser income data
 class ReminderParser:
     @staticmethod
     def parse(reminderText: str, telegram_id: int):
         # /remind <текст> | <время> [| приоритет] [| повтор]
         reminderParams = reminderText.split("|")
-        match (len(reminderParams)):
+        match len(reminderParams):
             case 2:
                 desc = ReminderDescParser.parseReminderDescription(reminderParams[0])
                 if not desc:
@@ -29,8 +35,8 @@ class ReminderParser:
                     text=desc,
                     remind_at=time,
                     priority=PriorityEntity.MEDIUM,
-                    status=StatusEntity.ACTIVE, 
-                    repeated_value=RepeatedValueEntity.ONCE
+                    status=StatusEntity.ACTIVE,
+                    repeated_value=RepeatedValueEntity.ONCE,
                 )
             case 3:
                 desc = ReminderDescParser.parseReminderDescription(reminderParams[0])
@@ -47,11 +53,10 @@ class ReminderParser:
                     raise ValueError(f"Invalid time format: '{reminderParams[1]}'")
 
                 if priority is None:
-
                     frequency = ReminderFrequencyParser.parseReminderFrequency(
-                            FreqTranslator.from_ru_to_eng(reminderParams[2])
+                        FreqTranslator.from_ru_to_eng(reminderParams[2])
                     )
-       
+
                     if not frequency:
                         raise ValueError(f"Invalid frequency: '{reminderParams[2]}'")
                     return ReminderEntity(
@@ -59,8 +64,8 @@ class ReminderParser:
                         text=desc,
                         remind_at=time,
                         priority=PriorityEntity.MEDIUM,
-                        status=StatusEntity.ACTIVE, 
-                        repeated_value=frequency
+                        status=StatusEntity.ACTIVE,
+                        repeated_value=frequency,
                     )
                 else:
                     return ReminderEntity(
@@ -68,14 +73,14 @@ class ReminderParser:
                         text=desc,
                         remind_at=time,
                         priority=priority,
-                        status=StatusEntity.ACTIVE, 
-                        repeated_value=RepeatedValueEntity.ONCE
+                        status=StatusEntity.ACTIVE,
+                        repeated_value=RepeatedValueEntity.ONCE,
                     )
             case 4:
                 desc = ReminderDescParser.parseReminderDescription(reminderParams[0])
                 time = ReminderDateTimeParser.parseReminderTime(reminderParams[1])
 
-                priority =  ReminderPriorityParser.parseReminderPriority(
+                priority = ReminderPriorityParser.parseReminderPriority(
                     PriorityTranslator.from_ru_to_eng(reminderParams[2])
                 )
                 frequency = ReminderFrequencyParser.parseReminderFrequency(
@@ -92,12 +97,12 @@ class ReminderParser:
                     raise ValueError(f"Invalid frequency: '{reminderParams[3]}'")
 
                 return ReminderEntity(
-                        telegram_id=telegram_id,
-                        text=desc,
-                        remind_at=time,
-                        priority=priority,
-                        status=StatusEntity.ACTIVE, 
-                        repeated_value=frequency
-                    )
+                    telegram_id=telegram_id,
+                    text=desc,
+                    remind_at=time,
+                    priority=priority,
+                    status=StatusEntity.ACTIVE,
+                    repeated_value=frequency,
+                )
             case _:
                 raise ValueError("Invalid format of reminder text")

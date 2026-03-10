@@ -1,5 +1,6 @@
-from app.entities import ReminderEntity
+from app.domain.entities import ReminderEntity
 from app.database import ReminderDb, RepeatedValueDb, StatusDb, PriorityDb
+
 
 def from_entity_to_model(entity: ReminderEntity) -> ReminderDb:
     return ReminderDb(
@@ -10,5 +11,5 @@ def from_entity_to_model(entity: ReminderEntity) -> ReminderDb:
         priority=PriorityDb(entity.priority.value.lower()),
         status=StatusDb(entity.status.value.lower()),
         created_at=entity.created_at,
-        repeated_value=RepeatedValueDb(entity.repeated_value.value.upper())
+        repeated_value=RepeatedValueDb(entity.repeated_value.value.upper()),
     )

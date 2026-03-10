@@ -1,18 +1,22 @@
-from app.translators.TranslatorMixin import FromRuTranslatorMixin, FromEngTranslatorMixin
-from app.entities import RepeatedValueEntity
+from app.translators.TranslatorMixin import (
+    FromRuTranslatorMixin,
+    FromEngTranslatorMixin,
+)
+from app.domain.entities import RepeatedValueEntity
+
 
 class FreqTranslator(FromRuTranslatorMixin, FromEngTranslatorMixin):
     @staticmethod
     def from_ru_to_eng(freq: str):
         """
-            Переводит русское написание частотности напоминания в английский вариант
-        
-            Поддерживаемые форматы:
-            1. ежедневно
-            2. еженедельно
-            3. ежемесячно
-            4. ежегодно
-            5. разово
+        Переводит русское написание частотности напоминания в английский вариант
+
+        Поддерживаемые форматы:
+        1. ежедневно
+        2. еженедельно
+        3. ежемесячно
+        4. ежегодно
+        5. разово
         """
         freqLowered = freq.lower().strip()
         if freqLowered == "ежедневно":
