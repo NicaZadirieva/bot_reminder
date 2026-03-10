@@ -1,13 +1,13 @@
 ﻿# Business logics
-from app.mappers import from_entity_to_model, from_model_to_entity
+from app.utils.mappers import from_entity_to_model, from_model_to_entity
 from app.infrastructure.repositories import ReminderRepository
 from typing import Any
 from typing import Optional, List, Any
 
 from app.domain.entities import ReminderEntity
-from app.database import ReminderDb, RepeatedValueDb, StatusDb
+from app.infrastructure.database import ReminderDb, RepeatedValueDb, StatusDb
 
-from app.utils.Utils import Utils
+from app.utils.TimeUtils import TimeUtils
 import logging
 
 logger = logging.getLogger(__name__)
@@ -42,12 +42,12 @@ class ReminderService:
         active = [r for r in all_reminders if r.status == StatusDb.ACTIVE]
 
         # 3️ Для ONCE - отфильтровать БУДУЩИЕ (не прошедшие)
-        now = Utils.get_now()
+        now = TimeUtils.get_now()
         to_schedule = [
             r
             for r in active
             if r.repeated_value != RepeatedValueDb.ONCE
-            or Utils._make_aware(r.remind_at) > now
+            or TimeUtils._make_aware(r.remind_at) > now
         ]
         return [from_model_to_entity(r) for r in to_schedule]
 

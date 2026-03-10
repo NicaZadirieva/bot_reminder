@@ -1,5 +1,10 @@
 from app.domain.entities import ReminderEntity
-from app.database import ReminderDb, RepeatedValueDb, StatusDb, PriorityDb
+from app.infrastructure.database import (
+    ReminderDb,
+    RepeatedValueDb,
+    StatusDb,
+    PriorityDb,
+)
 
 
 def from_entity_to_model(entity: ReminderEntity) -> ReminderDb:

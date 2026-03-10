@@ -1,8 +1,8 @@
 ﻿from typing import List
 from app.domain.entities import ReminderEntity
-from app.services.reminder_service import ReminderService
-from app.translators.StatusTranslator import StatusTranslator
-from app.translators.FreqTranslator import FreqTranslator
+from app.application.services.reminder_service import ReminderService
+from app.utils.translators.StatusTranslator import StatusTranslator
+from app.utils.translators.FreqTranslator import FreqTranslator
 from .base import CommandUseCase
 
 

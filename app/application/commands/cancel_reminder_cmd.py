@@ -1,5 +1,5 @@
 ﻿from .base import CommandUseCase
-from app.services.reminder_service import ReminderService
+from app.application.services.reminder_service import ReminderService
 from app.schedulers.reminder_scheduler import ReminderScheduler
 
 

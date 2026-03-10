@@ -9,8 +9,8 @@ from app.parsers.reminder_datetime_parser import ReminderDateTimeParser
 from app.parsers.reminder_desc_parser import ReminderDescParser
 from app.parsers.reminder_freq_parser import ReminderFrequencyParser
 from app.parsers.reminder_priority_parser import ReminderPriorityParser
-from app.translators.PriorityTranslator import PriorityTranslator
-from app.translators.FreqTranslator import FreqTranslator
+from app.utils.translators.PriorityTranslator import PriorityTranslator
+from app.utils.translators.FreqTranslator import FreqTranslator
 
 
 # Parser income data

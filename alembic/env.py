@@ -16,7 +16,8 @@ print(f"📁 Project root: {project_root}")
 print(f"🐍 Python path: {sys.path[0]}")
 
 try:
-    from app.database.models import Base, Reminder
+    from app.infrastructure.database.models import Base
+
     print("✅ Models imported successfully!")
     print(f"   Base.metadata.tables: {list(Base.metadata.tables.keys())}")
 except ImportError as e:
@@ -47,7 +48,7 @@ def run_migrations_online():
     """Online migrations."""
     configuration = config.get_section(config.config_ini_section)
     configuration["sqlalchemy.url"] = config.get_main_option("sqlalchemy.url")
-    
+
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
@@ -55,10 +56,7 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -7,8 +7,8 @@ from app.config import config
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.presentation.telegram_bot_controller import TelegramBotController
 from app.infrastructure.repositories import ReminderRepository
-from app.services.reminder_service import ReminderService
-from app.database import async_session
+from app.application.services.reminder_service import ReminderService
+from app.infrastructure.database import async_session
 from app.schedulers.reminder_scheduler import ReminderScheduler
 
 # Если setup_logger остался в этом же файле, оставьте его здесь или импортируйте

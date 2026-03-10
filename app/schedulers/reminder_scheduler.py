@@ -5,8 +5,8 @@ from pytz import timezone
 import logging
 from functools import partial
 
-from app.services.reminder_service import ReminderService
-from app.utils.Utils import Utils
+from app.application.services.reminder_service import ReminderService
+from app.utils.TimeUtils import TimeUtils
 
 logger = logging.getLogger(__name__)
 
@@ -105,8 +105,8 @@ class ReminderScheduler:
     def __create_once_task__(self, reminder: ReminderEntity):
         # РАЗОВОЕ НАПОМИНАНИЕ (ONCE)
         # Конвертировать в timezone-aware
-        remind_at_aware = Utils._make_aware(reminder.remind_at)
-        now = Utils.get_now()
+        remind_at_aware = TimeUtils._make_aware(reminder.remind_at)
+        now = TimeUtils.get_now()
         # Создать уникальный ID для этой задачи
         job_id = f"reminder_{reminder.id}"
 

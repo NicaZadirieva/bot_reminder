@@ -4,7 +4,7 @@ from app.domain.entities import (
     RepeatedValueEntity,
     PriorityEntity,
 )
-from app.database import ReminderDb
+from app.infrastructure.database import ReminderDb
 
 
 def from_model_to_entity(model: ReminderDb) -> ReminderEntity:

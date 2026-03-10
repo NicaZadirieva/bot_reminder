@@ -1,6 +1,6 @@
 # Reminder-specific repository
 from .postgres_repository import PostgresRepository
-from app.database import ReminderDb
+from app.infrastructure.database import ReminderDb
 
 
 class ReminderRepository(PostgresRepository):
