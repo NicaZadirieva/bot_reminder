@@ -1,4 +1,4 @@
-from app.domain.entities import ReminderEntity
+from app.application.domain.entities import ReminderEntity
 from app.infrastructure.database import (
     ReminderDb,
     RepeatedValueDb,

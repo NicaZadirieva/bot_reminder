@@ -1,4 +1,4 @@
-from app.domain.entities import (
+from app.application.domain.entities import (
     ReminderEntity,
     StatusEntity,
     RepeatedValueEntity,

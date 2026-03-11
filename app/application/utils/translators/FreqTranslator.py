@@ -2,7 +2,7 @@ from app.application.utils.translators.TranslatorMixin import (
     FromRuTranslatorMixin,
     FromEngTranslatorMixin,
 )
-from app.domain.entities import RepeatedValueEntity
+from app.application.domain.entities import RepeatedValueEntity
 
 
 class FreqTranslator(FromRuTranslatorMixin, FromEngTranslatorMixin):

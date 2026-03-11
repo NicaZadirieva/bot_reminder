@@ -1,4 +1,4 @@
-from app.domain.entities import StatusEntity
+from app.application.domain.entities import StatusEntity
 from app.application.utils.translators.TranslatorMixin import FromEngTranslatorMixin
 
 

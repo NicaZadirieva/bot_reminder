@@ -4,7 +4,7 @@ from app.infrastructure.repositories import ReminderRepository
 from typing import Any
 from typing import Optional, List, Any
 
-from app.domain.entities import ReminderEntity
+from app.application.domain.entities import ReminderEntity
 from app.infrastructure.database import ReminderDb, RepeatedValueDb, StatusDb
 
 from app.application.utils.TimeUtils import TimeUtils

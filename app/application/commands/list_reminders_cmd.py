@@ -1,5 +1,5 @@
 ﻿from typing import List
-from app.domain.entities import ReminderEntity
+from app.application.domain.entities import ReminderEntity
 from app.application.services.reminder_service import ReminderService
 from app.application.utils.translators.StatusTranslator import StatusTranslator
 from app.application.utils.translators.FreqTranslator import FreqTranslator
