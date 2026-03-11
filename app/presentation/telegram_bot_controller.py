@@ -3,6 +3,7 @@
 import logging
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
+from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.application.services.reminder_scheduler import ReminderScheduler
 
@@ -17,11 +18,11 @@ class TelegramBotController:
 
     def __init__(
         self,
-        bot_token: str,
+        aiogram_bot: Bot,
         reminder_dispatcher: ReminderDispatcher,
         reminder_scheduler: ReminderScheduler,
     ):
-        self.bot = Bot(token=bot_token)
+        self.bot = aiogram_bot
         self.dp = Dispatcher()
         self.router = Router()
         self.reminder_dispatcher = reminder_dispatcher
