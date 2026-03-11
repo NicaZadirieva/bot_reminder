@@ -1,5 +1,5 @@
 ﻿from app.domain.entities import ReminderEntity, RepeatedValueEntity
-from aiogram import Bot
+from app.abstracts.bot import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import logging

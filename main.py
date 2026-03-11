@@ -1,8 +1,8 @@
 ﻿import asyncio
 import logging
 from pathlib import Path
-
-from aiogram import Bot
+from aiogram import Bot as AiogramBot
+from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.shared.config import config
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.presentation.telegram_bot_controller import TelegramBotController
@@ -58,12 +58,16 @@ async def main():
     async with async_session() as session:
         repo = ReminderRepository()
         reminder_service = ReminderService(repo, session)
-        bot = Bot(token=config.BOT_TOKEN)  # для reminder_scheduler нужен bot
-        reminder_scheduler = ReminderScheduler(reminder_service, bot)
+        aiogram_bot = AiogramBot(
+            token=config.BOT_TOKEN
+        )  # для reminder_scheduler нужен bot
+        bot_adapter = AiogramBotAdapter(aiogram_bot)
+
+        reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
         reminder_dispatcher = ReminderDispatcher(reminder_service, reminder_scheduler)
 
         controller = TelegramBotController(
-            bot_token=config.BOT_TOKEN,
+            aiogram_bot=aiogram_bot,
             reminder_dispatcher=reminder_dispatcher,
             reminder_scheduler=reminder_scheduler,
         )
