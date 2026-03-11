@@ -1,6 +1,6 @@
 # PostgreSQL impl
 from sqlalchemy import select
-from app.domain.interfaces import IRepository
+from app.infrastructure.repositories.interfaces import IRepository
 
 
 class PostgresRepository(IRepository):

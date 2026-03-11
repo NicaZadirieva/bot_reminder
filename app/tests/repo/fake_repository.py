@@ -1,4 +1,4 @@
-from app.domain.interfaces import IRepository
+from app.infrastructure.repositories.interfaces import IRepository
 
 
 class IFakeRepository(IRepository):
