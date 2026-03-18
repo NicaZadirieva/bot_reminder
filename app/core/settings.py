@@ -2,7 +2,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Config(BaseSettings):
+class Settings(BaseSettings):
     # Telegram
     BOT_TOKEN: str = Field(default="default_token", validation_alias="BOT_TOKEN")
 
@@ -26,4 +26,4 @@ class Config(BaseSettings):
 
 
 # Создаём единственный экземпляр конфигурации
-config = Config()
+settings = Settings()

@@ -3,16 +3,13 @@ import logging
 from pathlib import Path
 from aiogram import Bot as AiogramBot
 from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
-from app.shared.config import config
+from app.core import settings
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.presentation.telegram_bot_controller import TelegramBotController
 from app.infrastructure.repositories import ReminderRepository
 from app.application.services.reminder_service import ReminderService
 from app.infrastructure.database import async_session
 from app.application.services.reminder_scheduler import ReminderScheduler
-
-# Если setup_logger остался в этом же файле, оставьте его здесь или импортируйте
-# from app.utils.logger import setup_logger
 
 
 def setup_logger():
@@ -24,9 +21,9 @@ def setup_logger():
     - DEBUG: True/False
     - LOG_LEVEL: DEBUG, INFO, WARNING, ERROR, CRITICAL, EXCEPTION
     """
-    environment = config.ENVIRONMENT.lower()
-    debug = config.DEBUG
-    log_level_str = config.LOG_LEVEL.upper()
+    environment = settings.ENVIRONMENT.lower()
+    debug = settings.DEBUG
+    log_level_str = settings.LOG_LEVEL.upper()
 
     log_level = getattr(logging, log_level_str, logging.INFO)
 
@@ -38,7 +35,7 @@ def setup_logger():
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
 
-    logging.basicConfig(
+    logging.basicsettings(
         level=log_level,
         format=log_format,
         datefmt="%Y-%m-%d %H:%M:%S",
@@ -58,9 +55,7 @@ async def main():
     async with async_session() as session:
         repo = ReminderRepository()
         reminder_service = ReminderService(repo, session)
-        aiogram_bot = AiogramBot(
-            token=config.BOT_TOKEN
-        )  # для reminder_scheduler нужен bot
+        aiogram_bot = AiogramBot(token=settings.BOT_TOKEN)
         bot_adapter = AiogramBotAdapter(aiogram_bot)
 
         reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
