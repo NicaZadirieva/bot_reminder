@@ -1,27 +1,29 @@
-# Configuration
-
-import os
-from dotenv import load_dotenv
-
-# Load .env
-load_dotenv()
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Config:
-    def __init__(self):
-        # Telegram
-        self.BOT_TOKEN = os.getenv("BOT_TOKEN", "default_token")
+class Config(BaseSettings):
+    # Telegram
+    BOT_TOKEN: str = Field(default="default_token", validation_alias="BOT_TOKEN")
 
-        # Database
-        self.DATABASE_URL = os.getenv(
-            "DATABASE_URL", "sqlite+aiosqlite:///./reminder_bot.db"
-        )
+    # Database
+    DATABASE_URL: str = Field(
+        default="sqlite+aiosqlite:///./reminder_bot.db", validation_alias="DATABASE_URL"
+    )
 
-        # Environment
-        self.DEBUG = os.getenv("DEBUG", "False") == "True"
-        self.ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
-        self.TIMEZONE = os.getenv("TIMEZONE", "UTC")
-        self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+    # Environment
+    DEBUG: bool = Field(default=False, validation_alias="DEBUG")
+    ENVIRONMENT: str = Field(default="development", validation_alias="ENVIRONMENT")
+    TIMEZONE: str = Field(default="UTC", validation_alias="TIMEZONE")
+    LOG_LEVEL: str = Field(default="INFO", validation_alias="LOG_LEVEL")
+
+    # Настройки для загрузки из .env
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",  # игнорировать лишние переменные окружения
+    )
 
 
+# Создаём единственный экземпляр конфигурации
 config = Config()
