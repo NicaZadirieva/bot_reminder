@@ -2,17 +2,15 @@
 import logging
 from pathlib import Path
 from aiogram import Bot as AiogramBot
+from pytz import timezone
 from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
-from app.shared.config import config
+from app.core import settings
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.presentation.telegram_bot_controller import TelegramBotController
 from app.infrastructure.repositories import ReminderRepository
 from app.application.services.reminder_service import ReminderService
 from app.infrastructure.database import async_session
 from app.application.services.reminder_scheduler import ReminderScheduler
-
-# Если setup_logger остался в этом же файле, оставьте его здесь или импортируйте
-# from app.utils.logger import setup_logger
 
 
 def setup_logger():
@@ -24,9 +22,9 @@ def setup_logger():
     - DEBUG: True/False
     - LOG_LEVEL: DEBUG, INFO, WARNING, ERROR, CRITICAL, EXCEPTION
     """
-    environment = config.ENVIRONMENT.lower()
-    debug = config.DEBUG
-    log_level_str = config.LOG_LEVEL.upper()
+    environment = settings.app.ENVIRONMENT.lower()
+    debug = settings.app.DEBUG
+    log_level_str = settings.app.LOG_LEVEL.upper()
 
     log_level = getattr(logging, log_level_str, logging.INFO)
 
@@ -58,12 +56,12 @@ async def main():
     async with async_session() as session:
         repo = ReminderRepository()
         reminder_service = ReminderService(repo, session)
-        aiogram_bot = AiogramBot(
-            token=config.BOT_TOKEN
-        )  # для reminder_scheduler нужен bot
+        aiogram_bot = AiogramBot(token=settings.app.BOT_TOKEN)
         bot_adapter = AiogramBotAdapter(aiogram_bot)
 
-        reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
+        reminder_scheduler = ReminderScheduler(
+            reminder_service, bot_adapter, timezone(settings.app.TIMEZONE)
+        )
         reminder_dispatcher = ReminderDispatcher(reminder_service, reminder_scheduler)
 
         controller = TelegramBotController(

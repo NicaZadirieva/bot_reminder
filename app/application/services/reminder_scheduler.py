@@ -1,5 +1,6 @@
 ﻿from app.application.domain.entities import ReminderEntity, RepeatedValueEntity
-from app.shared.abstracts.bot import Bot
+from app.core.settings import Settings
+from app.core.bot import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import logging
@@ -12,12 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 class ReminderScheduler:
-    def __init__(self, reminderService: ReminderService, bot: Bot):
+    def __init__(self, reminderService: ReminderService, bot: Bot, timezone: timezone):
         self.reminderService = reminderService
         self.bot = bot
         self.reminders = dict()
-        self.tz = timezone("Europe/Moscow")
-        self.scheduler = AsyncIOScheduler(timezone=self.tz)
+        self.scheduler = AsyncIOScheduler(timezone=timezone)
 
     async def load_reminders(self):
         """📥 Загрузить ВСЕ активные напоминания из БД"""
