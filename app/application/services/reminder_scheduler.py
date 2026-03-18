@@ -1,6 +1,6 @@
 ﻿from app.application.domain.entities import ReminderEntity, RepeatedValueEntity
 from app.core.settings import Settings
-from app.shared.abstracts.bot import Bot
+from app.core.bot import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import logging
