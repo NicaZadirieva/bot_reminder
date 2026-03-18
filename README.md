@@ -47,18 +47,30 @@
 
 ## 📦 Требования
 
-- **Python 3.9+**
+- **Python 3.13+**
 - **PostgreSQL 12+** (или SQLite для разработки)
 - **Telegram Bot Token**
 
-### Зависимости:
+### Основные зависимости:
 ```
-aiogram==3.1.0
-asyncpg==0.27.0
-apscheduler==3.10.0
-python-dotenv==1.0.0
-sqlalchemy==2.0.0
-alembic==1.13.0
+aiogram>=3.26.0
+alembic>=1.18.4
+apscheduler>=3.11.2
+asyncpg>=0.31.0
+dataclasses>=0.8          # для обратной совместимости (встроен в Python 3.7+)
+freezegun>=1.5.5          # для тестов
+pytest>=9.0.2
+pytest-asyncio>=1.3.0
+python-dotenv>=1.2.2
+pytz>=2026.1.post1
+sqlalchemy>=2.0.48
+tzlocal>=5.3.1
+virtualenv>=21.2.0
+```
+
+### Для разработки (dev):
+```
+ruff>=0.15.5               # линтер и форматтер
 ```
 
 ---
@@ -239,7 +251,20 @@ alembic==1.13.0
 ### Установка для разработки
 
 ```bash
-pip install -r requirements-dev.txt
+# Клонирование репозитория
+git clone <url>
+cd bot-reminder
+
+# Создание виртуального окружения (Python 3.13+)
+python -m venv venv
+source venv/bin/activate      # Linux/macOS
+# venv\Scripts\activate       # Windows
+
+# Установка проекта в режиме редактирования с dev-зависимостями
+# Если используется pip с поддержкой групп:
+pip install -e .[dev]
+# Или используя uv (быстрее):
+# uv pip install -e .[dev]
 ```
 
 ### Запуск тестов
@@ -247,21 +272,10 @@ pip install -r requirements-dev.txt
 ```bash
 pytest
 
-# С покрытием
-pytest --cov=app tests/
-
-# Конкретный тест
+# Для запуска конкретного теста:
 pytest tests/test_parser.py::test_parse_time
 ```
 
-### Запуск в режиме разработки
-
-```bash
-# С автоперезагрузкой
-python -m uvicorn main:app --reload
-
-# Или просто
-python main.py
-```
+---
 
 Спасибо за использование! 🚀
