@@ -13,11 +13,13 @@ handlers:
     stream: ext://sys.stdout
     formatter: default
   file:
-    class: logging.FileHandler
+    class: logging.handlers.TimedRotatingFileHandler
     encoding: utf-8
-    filename: app.log # путь к файлу лога
+    filename: logs/app_dev.log
     formatter: default
-    mode: a # режим записи: 'a' (добавление) или 'w' (перезапись)
+    when: "midnight" # ротация в полночь
+    interval: 1 # интервал (в единицах when)
+    backupCount: 7 # хранить 7 старых файлов
 
 root:
   level: DEBUG

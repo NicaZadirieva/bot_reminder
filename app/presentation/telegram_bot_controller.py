@@ -1,6 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
+from aiohttp import ClientConnectorError
 from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.application.services.reminder_scheduler import ReminderScheduler
@@ -76,7 +77,6 @@ class TelegramBotController:
         async def on_startup():
             logger.info("Telegram бот запускается...")
             await self.reminder_scheduler.start()
-            logger.info("Telegram бот успешно запущен")
 
         @self.dp.shutdown()
         async def on_shutdown():
@@ -88,5 +88,11 @@ class TelegramBotController:
         """Запускает поллинг бота."""
         try:
             await self.dp.start_polling(self.bot)
+            logger.info("Telegram бот успешно запущен")
+        except Exception:
+            logger.critical(
+                "Ошибка во время запуска Telegram bot. Работа бота невозможна",
+                exc_info=True,
+            )
         finally:
             await self.bot.session.close()

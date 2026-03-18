@@ -31,9 +31,6 @@ def setup_logger():
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
-    # 3. Устанавливаем имя файла лога в зависимости от окружения
-    config["handlers"]["file"]["filename"] = f"logs/app_{environment}.log"
-
     # Применяем конфигурацию
     logging.config.dictConfig(config)
 
