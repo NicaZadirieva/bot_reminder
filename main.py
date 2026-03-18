@@ -2,6 +2,7 @@
 import logging
 from pathlib import Path
 from aiogram import Bot as AiogramBot
+from pytz import timezone
 from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.core import settings
 from app.presentation.command_dispatcher import ReminderDispatcher
@@ -58,7 +59,9 @@ async def main():
         aiogram_bot = AiogramBot(token=settings.app.BOT_TOKEN)
         bot_adapter = AiogramBotAdapter(aiogram_bot)
 
-        reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
+        reminder_scheduler = ReminderScheduler(
+            reminder_service, bot_adapter, timezone(settings.app.TIMEZONE)
+        )
         reminder_dispatcher = ReminderDispatcher(reminder_service, reminder_scheduler)
 
         controller = TelegramBotController(
