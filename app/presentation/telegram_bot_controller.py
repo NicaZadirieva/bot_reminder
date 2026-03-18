@@ -1,5 +1,3 @@
-# app/presentation/telegram_bot_controller.py
-
 import logging
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command

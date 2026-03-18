@@ -1,0 +1,25 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  default:
+    format: "%(asctime)s - [%(levelname)s] - %(name)s - %(message)s - user_id: %(user_id)s"
+    defaults:
+      user_id: "-"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+    formatter: default
+  file:
+    class: logging.FileHandler
+    encoding: utf-8
+    filename: app.log # путь к файлу лога
+    formatter: default
+    mode: a # режим записи: 'a' (добавление) или 'w' (перезапись)
+
+root:
+  level: DEBUG
+  handlers: [console, file] # теперь логи пишутся и в консоль, и в файл
+
