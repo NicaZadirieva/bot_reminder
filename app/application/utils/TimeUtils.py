@@ -1,12 +1,14 @@
 ﻿from datetime import datetime, timezone as dt_timezone
 from pytz import timezone
 
+from app.shared.config import config
+
 
 class TimeUtils:
     @staticmethod
     def get_tz() -> timezone:
         """Получить timezone Moscow"""
-        return timezone("Europe/Moscow")
+        return timezone(config.TIMEZONE)
 
     @staticmethod
     def get_now() -> datetime:
