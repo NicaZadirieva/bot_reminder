@@ -8,10 +8,8 @@ class AppSettings(BaseModel):
     BOT_TOKEN: str = Field(
         ..., min_length=10, description="Bot token from @BotFather or from VK_API"
     )
-    DEBUG: bool = False
     ENVIRONMENT: str = "development"
     TIMEZONE: str = "Europe/Moscow"
-    LOG_LEVEL: str = "INFO"
 
 
 class DatabaseSettings(BaseModel):
@@ -41,10 +39,8 @@ class DatabaseSettings(BaseModel):
 class Settings(BaseSettings):
     BOT_TOKEN: str = Field(..., min_length=10)
     DATABASE_URL: str = Field(..., min_length=10)
-    DEBUG: bool = False
     ENVIRONMENT: str = "development"
     TIMEZONE: str = "Europe/Moscow"
-    LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -60,23 +56,12 @@ class Settings(BaseSettings):
             raise ValueError(f"ENVIRONMENT must be one of {allowed}")
         return v
 
-    @field_validator("LOG_LEVEL")
-    @classmethod
-    def validate_log_level(cls, v: str) -> str:
-        allowed = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
-        upper_v = v.upper()
-        if upper_v not in allowed:
-            raise ValueError(f"LOG_LEVEL must be one of {allowed}")
-        return upper_v
-
     @property
     def app(self) -> AppSettings:
         return AppSettings(
             BOT_TOKEN=self.BOT_TOKEN,
-            DEBUG=self.DEBUG,
             ENVIRONMENT=self.ENVIRONMENT,
             TIMEZONE=self.TIMEZONE,
-            LOG_LEVEL=self.LOG_LEVEL,
         )
 
     @property

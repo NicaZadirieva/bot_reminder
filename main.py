@@ -1,5 +1,7 @@
 ﻿import asyncio
 import logging
+import logging.config
+import yaml
 from pathlib import Path
 from aiogram import Bot as AiogramBot
 from pytz import timezone
@@ -15,38 +17,27 @@ from app.application.services.reminder_scheduler import ReminderScheduler
 
 def setup_logger():
     """
-    Настройка и возврат логгера на основе конфигурации из .env
-
-    Переменные .env:
-    - ENVIRONMENT: development, staging, production
-    - DEBUG: True/False
-    - LOG_LEVEL: DEBUG, INFO, WARNING, ERROR, CRITICAL, EXCEPTION
+    Настройка логирования на основе log_conf.yaml и параметров из .env.
     """
+    # Получаем параметры из настроек
     environment = settings.app.ENVIRONMENT.lower()
-    debug = settings.app.DEBUG
-    log_level_str = settings.app.LOG_LEVEL.upper()
 
-    log_level = getattr(logging, log_level_str, logging.INFO)
-
-    if debug or environment == "development":
-        log_format = "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
-    else:
-        log_format = "%(asctime)s - %(levelname)s - %(message)s"
-
+    # Создаём директорию для логов, если её нет
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
 
-    logging.basicConfig(
-        level=log_level,
-        format=log_format,
-        datefmt="%Y-%m-%d %H:%M:%S",
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler(
-                filename=f"logs/app_{environment}.log", encoding="utf-8"
-            ),
-        ],
-    )
+    # Загружаем конфигурацию из YAML
+    config_path = Path(f"log_conf.{environment}.yaml")  # или укажите полный путь
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+
+    # 3. Устанавливаем имя файла лога в зависимости от окружения
+    config["handlers"]["file"]["filename"] = f"logs/app_{environment}.log"
+
+    # Применяем конфигурацию
+    logging.config.dictConfig(config)
+
+    # 4. Отдельная настройка уровней для сторонних библиотек
     logging.getLogger("apscheduler").setLevel(logging.WARNING)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
