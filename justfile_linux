@@ -1,0 +1,21 @@
+# Список доступных команд
+@a_default:
+    just --list
+
+# Запуск в режиме разработки
+@dev:
+    export ENVIRONMENT=development
+    uv run python main.py
+
+# Запуск в production режиме
+@prod:
+    export ENVIRONMENT=production
+    uv run python main.py
+
+# Запуск линтера
+@lint:
+    uv run ruff check --fix
+
+# Форматирование кода
+@format:
+    uv run ruff format
