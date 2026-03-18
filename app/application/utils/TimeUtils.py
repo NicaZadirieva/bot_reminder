@@ -7,8 +7,8 @@ from app.core import settings
 class TimeUtils:
     @staticmethod
     def get_tz() -> timezone:
-        """Получить timezone Moscow"""
-        return timezone(settings.TIMEZONE)
+        # TODO: удалить get_tz
+        return timezone(settings.app.TIMEZONE)
 
     @staticmethod
     def get_now() -> datetime:

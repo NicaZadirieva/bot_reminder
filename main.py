@@ -21,9 +21,9 @@ def setup_logger():
     - DEBUG: True/False
     - LOG_LEVEL: DEBUG, INFO, WARNING, ERROR, CRITICAL, EXCEPTION
     """
-    environment = settings.ENVIRONMENT.lower()
-    debug = settings.DEBUG
-    log_level_str = settings.LOG_LEVEL.upper()
+    environment = settings.app.ENVIRONMENT.lower()
+    debug = settings.app.DEBUG
+    log_level_str = settings.app.LOG_LEVEL.upper()
 
     log_level = getattr(logging, log_level_str, logging.INFO)
 
@@ -35,7 +35,7 @@ def setup_logger():
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
 
-    logging.basicsettings(
+    logging.basicConfig(
         level=log_level,
         format=log_format,
         datefmt="%Y-%m-%d %H:%M:%S",
@@ -55,7 +55,7 @@ async def main():
     async with async_session() as session:
         repo = ReminderRepository()
         reminder_service = ReminderService(repo, session)
-        aiogram_bot = AiogramBot(token=settings.BOT_TOKEN)
+        aiogram_bot = AiogramBot(token=settings.app.BOT_TOKEN)
         bot_adapter = AiogramBotAdapter(aiogram_bot)
 
         reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
