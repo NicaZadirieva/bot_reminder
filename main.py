@@ -7,11 +7,12 @@ from aiogram import Bot as AiogramBot
 from pytz import timezone
 from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.core import settings
+from app.core.db import async_session
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.presentation.telegram_bot_controller import TelegramBotController
 from app.infrastructure.repositories import ReminderRepository
 from app.application.services.reminder_service import ReminderService
-from app.infrastructure.database import async_session
+
 from app.application.services.reminder_scheduler import ReminderScheduler
 
 
@@ -42,8 +43,8 @@ def setup_logger():
 async def main():
     setup_logger()
     async with async_session() as session:
-        repo = ReminderRepository()
-        reminder_service = ReminderService(repo, session)
+        repo = ReminderRepository(session)
+        reminder_service = ReminderService(repo)
         aiogram_bot = AiogramBot(token=settings.app.BOT_TOKEN)
         bot_adapter = AiogramBotAdapter(aiogram_bot)
 

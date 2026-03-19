@@ -8,21 +8,21 @@ class IRepository(ABC, Generic[T]):
     """Base repo"""
 
     @abstractmethod
-    async def get_by_id(self, session, id: int) -> Optional[T]:
+    async def get_by_id(self, id: int) -> Optional[T]:
         pass
 
     @abstractmethod
-    async def get_all(self, session) -> List[T]:
+    async def get_all(self) -> List[T]:
         pass
 
     @abstractmethod
-    async def create(self, session, obj: T) -> T:
+    async def create(self, obj: T) -> T:
         pass
 
     @abstractmethod
-    async def update(self, session, id: int, **kwargs) -> T:
+    async def update(self, id: int, **kwargs) -> T:
         pass
 
     @abstractmethod
-    async def delete(self, session, id: int) -> bool:
+    async def delete(self, id: int) -> bool:
         pass

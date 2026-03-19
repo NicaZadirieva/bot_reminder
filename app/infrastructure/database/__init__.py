@@ -1,4 +1,3 @@
-from .connection import init_db, async_session
 from .models import (
     Priority as PriorityDb,
     Status as StatusDb,
@@ -7,8 +6,6 @@ from .models import (
 )
 
 __all__ = [
-    "async_session",
-    "init_db",
     "PriorityDb",
     "StatusDb",
     "RepeatedValueDb",

@@ -1,8 +1,7 @@
 ﻿# Business logics
 from app.application.utils.mappers import from_entity_to_model, from_model_to_entity
 from app.infrastructure.repositories import ReminderRepository
-from typing import Any
-from typing import Optional, List, Any
+from typing import Optional, List
 
 from app.application.domain.entities import ReminderEntity
 from app.infrastructure.database import ReminderDb, RepeatedValueDb, StatusDb
@@ -14,29 +13,28 @@ logger = logging.getLogger(__name__)
 
 
 class ReminderService:
-    def __init__(self, repo: ReminderRepository, dbSession: Any):
+    def __init__(self, repo: ReminderRepository):
         self.reminderRepo = repo
-        self.dbSession = dbSession
 
     async def check_if_reminder_exists(self, id: int, user_id: int) -> bool:
-        reminderDb = await self.reminderRepo.get_by_id(self.dbSession, id)
+        reminderDb = await self.reminderRepo.get_by_id(id)
         if reminderDb and reminderDb.telegram_id != user_id:
             # напоминание не принадлежит пользователю
             return False
-        return not (reminderDb is None)
+        return reminderDb is not None
 
-    def filter_reminders_by_user(
+    def __filter_reminders_by_user__(
         self, reminders: List[ReminderDb], user_id: int
     ) -> List[ReminderEntity]:
         return [from_model_to_entity(r) for r in reminders if r.telegram_id == user_id]
 
     async def get_all_reminders(self, user_id: int) -> List[ReminderEntity]:
-        all_reminders = await self.reminderRepo.get_all(self.dbSession)
-        return self.filter_reminders_by_user(all_reminders, user_id)
+        all_reminders = await self.reminderRepo.get_all()
+        return self.__filter_reminders_by_user__(all_reminders, user_id)
 
     async def get_all_active_reminders(self) -> List[ReminderEntity]:
         # 1️ Получить ВСЕ напоминания
-        all_reminders = await self.reminderRepo.get_all(self.dbSession)
+        all_reminders = await self.reminderRepo.get_all()
 
         # 2️ Отфильтровать АКТИВНЫЕ
         active = [r for r in all_reminders if r.status == StatusDb.ACTIVE]
@@ -53,24 +51,26 @@ class ReminderService:
 
     async def cancel_reminder_by_id(
         self, id: int, user_id: Optional[int]
-    ) -> ReminderEntity:
+    ) -> ReminderEntity | None:
         if user_id is None:
-            reminderDb = await self.reminderRepo.update(
-                self.dbSession, id, status=StatusDb.CANCELLED
-            )
-            return from_model_to_entity(reminderDb)
+            reminderDb = await self.reminderRepo.update(id, status=StatusDb.CANCELLED)
+            if reminderDb is not None:
+                return from_model_to_entity(reminderDb)
+            else:
+                return None
         else:
             is_reminder_exists = await self.check_if_reminder_exists(id, user_id)
             if is_reminder_exists:
                 reminderDb = await self.reminderRepo.update(
-                    self.dbSession, id, status=StatusDb.CANCELLED
+                    id, status=StatusDb.CANCELLED
                 )
-                return from_model_to_entity(reminderDb)
+                if reminderDb is not None:
+                    return from_model_to_entity(reminderDb)
+                else:
+                    return None
             else:
                 return None
 
     async def create_reminder(self, reminder: ReminderEntity) -> ReminderEntity:
-        reminderDb = await self.reminderRepo.create(
-            self.dbSession, from_entity_to_model(reminder)
-        )
+        reminderDb = await self.reminderRepo.create(from_entity_to_model(reminder))
         return from_model_to_entity(reminderDb)
