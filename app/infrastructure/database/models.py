@@ -1,20 +1,23 @@
-from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum
 from datetime import datetime
-from sqlalchemy.orm import DeclarativeBase
 from enum import Enum as PyEnum
 
-class Base(DeclarativeBase):
-    pass
+from sqlalchemy import String, Integer, DateTime, Enum
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.core.db import Base
+
 
 class Priority(PyEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
 
+
 class Status(PyEnum):
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+
 
 class RepeatedValue(PyEnum):
     ONCE = "ONCE"
@@ -23,24 +26,19 @@ class RepeatedValue(PyEnum):
     MONTHLY = "MONTHLY"
     YEARLY = "YEARLY"
 
+
 class Reminder(Base):
     __tablename__ = "reminders"
-    
-    id = Column(Integer, primary_key=True)
-    telegram_id = Column(Integer)
-    text = Column(String(200), nullable=False)
-    remind_at = Column(DateTime, nullable=False)
-    priority = Column(
-        SQLEnum(Priority),
-        default=Priority.MEDIUM
-    )
-    status = Column(
-        SQLEnum(Status),
-        default=Status.ACTIVE
-    )
-    created_at = Column(DateTime, default=datetime.now)
-    repeated_value = Column(
-        SQLEnum(RepeatedValue, name="repeated_value_enum"),
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(Integer)
+    text: Mapped[str] = mapped_column(String(200), nullable=False)
+    remind_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    priority: Mapped[Priority] = mapped_column(Enum(Priority), default=Priority.MEDIUM)
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.ACTIVE)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    repeated_value: Mapped[RepeatedValue] = mapped_column(
+        Enum(RepeatedValue, name="repeated_value_enum"),
         nullable=False,
-        default=RepeatedValue.ONCE
+        default=RepeatedValue.ONCE,
     )

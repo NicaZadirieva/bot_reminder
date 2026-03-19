@@ -210,3 +210,4 @@ __marimo__/
 # visual studio
 .vs
 TestResults
+/logs

@@ -14,6 +14,9 @@ class AppSettings(BaseModel):
 
 class DatabaseSettings(BaseModel):
     DATABASE_URL: str = Field(..., min_length=10, description="Database connection URL")
+    DATABASE_URL_SYNC: str = Field(
+        ..., min_length=10, description="Database connection sync URL"
+    )
 
     @field_validator("DATABASE_URL")
     @classmethod
@@ -39,6 +42,7 @@ class DatabaseSettings(BaseModel):
 class Settings(BaseSettings):
     BOT_TOKEN: str = Field(..., min_length=10)
     DATABASE_URL: str = Field(..., min_length=10)
+    DATABASE_URL_SYNC: str = Field(..., min_length=10)
     ENVIRONMENT: str = "development"
     TIMEZONE: str = "Europe/Moscow"
 
@@ -66,7 +70,9 @@ class Settings(BaseSettings):
 
     @property
     def db(self) -> DatabaseSettings:
-        return DatabaseSettings(DATABASE_URL=self.DATABASE_URL)
+        return DatabaseSettings(
+            DATABASE_URL=self.DATABASE_URL, DATABASE_URL_SYNC=self.DATABASE_URL_SYNC
+        )
 
 
 settings = Settings()  # type:ignore[call-arg]
