@@ -20,6 +20,7 @@ from app.application.services.reminder_scheduler import ReminderScheduler
 from vkbottle import Bot as VkBot
 
 from app.presentation.vk_bot_controller import VkBotController
+from app.presentation.vk_client import VKClient
 
 
 def setup_logger():
@@ -70,22 +71,32 @@ async def main():
         await controller.start()
 
 
-def main2():
+async def main2():
     setup_logger()
 
-    vk_bot = VkBot(token=settings.vk_app.VK_API_TOKEN)
-    bot_adapter = VkBotAdapter(vk_bot)
-    reminder_parser = ReminderParser(PlatformEntity.VK)
+    async with async_session() as session:
+        repo = ReminderRepository(session, PlatformDb.VK)
+        reminder_service = ReminderService(repo)
 
-    controller = VkBotController(
-        vk_bot=vk_bot,
-        bot_adapter=bot_adapter,
-        reminder_parser=reminder_parser,
-        session_factory=async_session,
-        timezone_str=settings.common_app.TIMEZONE,
-    )
-    controller.start()
+        vk_client = VKClient(token=settings.vk_app.VK_API_TOKEN)
+        bot_adapter = VkBotAdapter(vk_client)
+
+        reminder_parser = ReminderParser(PlatformEntity.VK)
+        reminder_scheduler = ReminderScheduler(
+            reminder_service, bot_adapter, timezone(settings.common_app.TIMEZONE)
+        )
+        reminder_dispatcher = ReminderDispatcher(
+            reminder_service, reminder_scheduler, reminder_parser
+        )
+
+        controller = VkBotController(
+            vk_client=vk_client,
+            reminder_dispatcher=reminder_dispatcher,
+            reminder_scheduler=reminder_scheduler,
+        )
+
+        await controller.start()
 
 
 if __name__ == "__main__":
-    main2()
+    asyncio.run(main2())
