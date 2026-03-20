@@ -70,9 +70,14 @@ async def main():
         await controller.start()
 
 
-async def main2():
+def main2():
     setup_logger()
-    session = async_session()
+    # Создаём новый цикл событий
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    # Получаем сессию через __aenter__
+    session = loop.run_until_complete(async_session().__aenter__())
     try:
         repo = ReminderRepository(session, PlatformDb.VK)
         reminder_service = ReminderService(repo)
@@ -94,11 +99,13 @@ async def main2():
             reminder_scheduler=reminder_scheduler,
         )
 
-        # Запускаем бота (асинхронный метод)
-        await controller.start()
+        # Запускаем асинхронный метод start_scheduler (или start) в этом же цикле
+        controller.start()
     finally:
-        await session.close()
+        # Закрываем сессию через __aexit__
+        loop.run_until_complete(session.__aexit__(None, None, None))
+        loop.close()
 
 
 if __name__ == "__main__":
-    asyncio.run(main2())
+    main2()

@@ -1,8 +1,6 @@
 import logging
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
-from aiohttp import ClientConnectorError
-from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.application.services.reminder_scheduler import ReminderScheduler
 

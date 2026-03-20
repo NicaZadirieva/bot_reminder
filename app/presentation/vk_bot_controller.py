@@ -2,6 +2,7 @@ import asyncio
 import logging
 from vkbottle import Bot
 from vkbottle.bot import BotLabeler, Message
+
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.application.services.reminder_scheduler import ReminderScheduler
 
@@ -12,6 +13,7 @@ class VkBotController:
     """
     Контроллер для VK бота, использующий vkbottle.
     Инкапсулирует создание, настройку и запуск бота.
+    Использует bot.loop_wrapper для управления задачами запуска/остановки.
     """
 
     def __init__(
@@ -26,6 +28,8 @@ class VkBotController:
         self.labeler = BotLabeler()
 
         self._setup_handlers()
+        self._register_loop_tasks()
+        self.bot.labeler = self.labeler
 
     def _setup_handlers(self) -> None:
         """Регистрирует все обработчики сообщений."""
@@ -66,34 +70,32 @@ class VkBotController:
             )
             await message.answer(response)
 
-        # Подключаем лейблер к боту
-        self.bot.labeler = self.labeler
+    def _register_loop_tasks(self) -> None:
+        loop = self.bot.loop_wrapper.loop
+        self._create_tasks(loop)
 
-    def _run_bot_blocking(self) -> None:
-        """
-        Блокирующий запуск бота.
-        Этот метод должен выполняться в отдельном потоке, так как
-        self.bot.run_forever() блокирует выполнение до остановки бота.
-        """
-        self.bot.run_forever()
+    async def _delayed_register(self):
+        loop = asyncio.get_running_loop()
+        self._create_tasks(loop)
 
-    async def start(self) -> None:
-        """
-        Запускает планировщик и бота.
-        Планировщик запускается асинхронно, а бот — в отдельном потоке
-        через asyncio.to_thread, чтобы не блокировать основной цикл событий.
-        """
+    def _create_tasks(self, loop):
+        startup_task = loop.create_task(self.reminder_scheduler.start())
+        shutdown_task = loop.create_task(self.reminder_scheduler.shutdown())
+        self.bot.loop_wrapper.on_startup.append(startup_task)
+        self.bot.loop_wrapper.on_shutdown.append(shutdown_task)
+
+    def start(self) -> None:
+        """Запускает бота."""
         try:
             logger.info("VK бот запускается...")
-            await self.reminder_scheduler.start()
-            logger.info("Планировщик запущен, запускаем VK бота...")
-
-            # Запускаем блокирующий метод в отдельном потоке
-            await asyncio.to_thread(self._run_bot_blocking)
-
+            # Вся логика жизненного цикла уже зарегистрирована в loop_wrapper
+            self.bot.run_forever()
+            logger.info("VK бот успешно запущен")
         except Exception:
-            logger.critical("Ошибка во время запуска VK бота", exc_info=True)
+            logger.critical(
+                "Ошибка во время запуска VK бота. Работа бота невозможна",
+                exc_info=True,
+            )
         finally:
-            logger.info("Останавливаем планировщик...")
-            await self.reminder_scheduler.shutdown()
-            logger.info("VK бот остановлен")
+            # Дополнительная очистка, если необходимо
+            pass
