@@ -63,20 +63,70 @@ class VkBotController:
             logger.info("VK бот остановлен")
 
     async def _handle_update(self, update: Dict[str, Any]) -> None:
-        """Обрабатывает событие. type=4 — новое сообщение."""
-        if update.get("type") != 4:
+        logger.debug(update)
+        if update.get("type") != "message_new":
             return
 
-        msg_obj = update.get("object")
-        if not msg_obj:
+        obj = update.get("object")
+        if not obj:
             return
 
-        user_id = msg_obj.get("from_id")
-        text = msg_obj.get("text", "")
+        message = obj.get("message")
+        if not message:
+            return
+
+        user_id = message.get("from_id")
+        text = message.get("text", "")
 
         if not user_id or text is None:
             return
 
+        # Разбор команды (первое слово без "/")
+        command = None
+        if text.startswith("/"):
+            parts = text.split(maxsplit=1)
+            command = parts[0][1:].lower()  # убираем '/'
+
+        # Диспетчеризация по командам
+        if command == "start" or command == "help":
+            await self._handle_start_help(user_id, text)
+        elif command == "remind":
+            await self._handle_remind(user_id, text)
+        elif command == "cancel_reminder":
+            await self._handle_cancel_reminder(user_id, text)
+        elif command == "reminders":
+            await self._handle_list_reminders(user_id, text)
+        else:
+            # Любое сообщение без команды или неизвестная команда
+            await self._handle_unknown(user_id, text)
+
+    # --- Обработчики команд ---
+    async def _handle_start_help(self, user_id: int, text: str) -> None:
+        """Обработчик /start и /help."""
+        response = await self.dispatcher.dispatch(user_id=user_id, text=text)
+        if response:
+            await self.client.send_message(user_id, response)
+
+    async def _handle_remind(self, user_id: int, text: str) -> None:
+        """Обработчик /remind."""
+        response = await self.dispatcher.dispatch(user_id=user_id, text=text)
+        if response:
+            await self.client.send_message(user_id, response)
+
+    async def _handle_cancel_reminder(self, user_id: int, text: str) -> None:
+        """Обработчик /cancel_reminder."""
+        response = await self.dispatcher.dispatch(user_id=user_id, text=text)
+        if response:
+            await self.client.send_message(user_id, response)
+
+    async def _handle_list_reminders(self, user_id: int, text: str) -> None:
+        """Обработчик /reminders."""
+        response = await self.dispatcher.dispatch(user_id=user_id, text=text)
+        if response:
+            await self.client.send_message(user_id, response)
+
+    async def _handle_unknown(self, user_id: int, text: str) -> None:
+        """Обработчик всех остальных сообщений."""
         response = await self.dispatcher.dispatch(user_id=user_id, text=text)
         if response:
             await self.client.send_message(user_id, response)
