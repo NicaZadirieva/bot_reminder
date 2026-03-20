@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class VKClient:
-    def __init__(self, token: str, version: str = "5.131"):
+    def __init__(self, token: str, version: str = "5.199"):
         self.token = token
         self.version = version
         self.api_url = "https://api.vk.com/method/"
@@ -56,14 +56,19 @@ class VKClient:
             return None
 
     async def get_longpoll_server(self) -> Dict[str, Any]:
-        return await self._request(
+        result = await self._request(
             "groups.getLongPollServer", {"group_id": settings.vk_app.VK_GROUP_ID}
-        )  # укажите group_id
+        )
+        logger.info(f"LongPoll server response: {result}")
+        return result
 
     async def poll_events(
         self, server: str, key: str, ts: int, wait: int = 25
     ) -> Dict[str, Any]:
-        url = f"https://{server}?act=a_check&key={key}&ts={ts}&wait={wait}"
+        # Добавим проверку на пустой server
+        if not server:
+            raise ValueError("LongPoll server is empty")
+        url = f"{server}?act=a_check&key={key}&ts={ts}&wait={wait}"
         async with self.session.get(url) as resp:
             return await resp.json()
 

@@ -28,7 +28,10 @@ class VkBotController:
 
         try:
             lp_data = await self.client.get_longpoll_server()
-            server = lp_data["server"]
+            server = lp_data.get("server")
+            if not server:
+                logger.error(f"Invalid LongPoll response: {lp_data}")
+                raise RuntimeError("LongPoll server not found")
             key = lp_data["key"]
             ts = lp_data["ts"]
             logger.info(f"LongPoll подключён. server={server}, key={key}, ts={ts}")
