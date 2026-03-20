@@ -1,103 +1,99 @@
 import asyncio
 import logging
-from typing import Dict, Any
-
-
+from vkbottle import Bot
+from vkbottle.bot import BotLabeler, Message
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.application.services.reminder_scheduler import ReminderScheduler
-from app.presentation.vk_client import VKClient
 
 logger = logging.getLogger(__name__)
 
 
 class VkBotController:
     """
-    Контроллер для VK бота без использования vkbottle.
-    Управляет longpoll подключением и диспетчеризацией сообщений.
+    Контроллер для VK бота, использующий vkbottle.
+    Инкапсулирует создание, настройку и запуск бота.
     """
 
     def __init__(
         self,
-        vk_client: VKClient,
+        vk_bot: Bot,
         reminder_dispatcher: ReminderDispatcher,
         reminder_scheduler: ReminderScheduler,
     ):
-        self.client = vk_client
-        self.dispatcher = reminder_dispatcher
-        self.scheduler = reminder_scheduler
-        self._running = True
+        self.bot = vk_bot
+        self.reminder_dispatcher = reminder_dispatcher
+        self.reminder_scheduler = reminder_scheduler
+        self.labeler = BotLabeler()
+
+        self._setup_handlers()
+
+    def _setup_handlers(self) -> None:
+        """Регистрирует все обработчики сообщений."""
+
+        @self.labeler.message(text="/start")
+        @self.labeler.message(text="/help")
+        async def handle_start_help(message: Message):
+            response = await self.reminder_dispatcher.dispatch(
+                user_id=message.from_id, text=message.text or ""
+            )
+            await message.answer(response)
+
+        @self.labeler.message(text="/remind")
+        async def handle_remind(message: Message):
+            response = await self.reminder_dispatcher.dispatch(
+                user_id=message.from_id, text=message.text or ""
+            )
+            await message.answer(response)
+
+        @self.labeler.message(text="/cancel_reminder")
+        async def handle_cancel(message: Message):
+            response = await self.reminder_dispatcher.dispatch(
+                user_id=message.from_id, text=message.text or ""
+            )
+            await message.answer(response)
+
+        @self.labeler.message(text="/reminders")
+        async def handle_list(message: Message):
+            response = await self.reminder_dispatcher.dispatch(
+                user_id=message.from_id, text=message.text or ""
+            )
+            await message.answer(response)
+
+        @self.labeler.message()
+        async def handle_unknown(message: Message):
+            response = await self.reminder_dispatcher.dispatch(
+                user_id=message.from_id, text=message.text or ""
+            )
+            await message.answer(response)
+
+        # Подключаем лейблер к боту
+        self.bot.labeler = self.labeler
+
+    def _run_bot_blocking(self) -> None:
+        """
+        Блокирующий запуск бота.
+        Этот метод должен выполняться в отдельном потоке, так как
+        self.bot.run_forever() блокирует выполнение до остановки бота.
+        """
+        self.bot.run_forever()
 
     async def start(self) -> None:
-        """Запускает планировщик и цикл обработки событий LongPoll."""
-        logger.info("VK бот запускается...")
-        await self.scheduler.start()
-
+        """
+        Запускает планировщик и бота.
+        Планировщик запускается асинхронно, а бот — в отдельном потоке
+        через asyncio.to_thread, чтобы не блокировать основной цикл событий.
+        """
         try:
-            # Получаем параметры longpoll
-            lp_data = await self.client.get_longpoll_server()
-            server = lp_data["server"]
-            key = lp_data["key"]
-            ts = lp_data["ts"]
+            logger.info("VK бот запускается...")
+            await self.reminder_scheduler.start()
+            logger.info("Планировщик запущен, запускаем VK бота...")
 
-            logger.info(f"LongPoll подключен. Server: {server}, key: {key}, ts: {ts}")
+            # Запускаем блокирующий метод в отдельном потоке
+            await asyncio.to_thread(self._run_bot_blocking)
 
-            while self._running:
-                # Опрашиваем longpoll сервер
-                events = await self.client.poll_events(server, key, ts)
-                if "failed" in events:
-                    # Обработка ошибок (обычно требуется обновить ключ)
-                    logger.warning(f"LongPoll error: {events}")
-                    if events.get("failed") == 1:
-                        ts = events.get("ts", ts)
-                    else:
-                        # Перезапрашиваем сервер
-                        lp_data = await self.client.get_longpoll_server()
-                        server = lp_data["server"]
-                        key = lp_data["key"]
-                        ts = lp_data["ts"]
-                    continue
-
-                ts = events["ts"]
-                for update in events.get("updates", []):
-                    await self._handle_update(update)
-
-        except asyncio.CancelledError:
-            logger.info("LongPoll цикл отменён")
-        except Exception as e:
-            logger.critical(f"Ошибка в LongPoll цикле: {e}", exc_info=True)
+        except Exception:
+            logger.critical("Ошибка во время запуска VK бота", exc_info=True)
         finally:
-            await self.scheduler.shutdown()
-            await self.client.close()
+            logger.info("Останавливаем планировщик...")
+            await self.reminder_scheduler.shutdown()
             logger.info("VK бот остановлен")
-
-    async def _handle_update(self, update: Dict[str, Any]) -> None:
-        """
-        Обрабатывает одно событие от LongPoll.
-        Сейчас обрабатываются только новые сообщения (type=4).
-        """
-        # Формат события: https://vk.com/dev/using_longpoll
-        # Тип 4 — новое сообщение
-        if update.get("type") != 4:
-            return
-
-        # Сообщение может быть от пользователя (флаг &2 !=0)
-        # В упрощённом варианте берём первый объект
-        msg_obj = update.get("object")
-        if not msg_obj:
-            return
-
-        # Поле from_id — отправитель
-        user_id = msg_obj.get("from_id")
-        text = msg_obj.get("text", "")
-
-        if not user_id or text is None:
-            return
-
-        # Диспетчеризация команды
-        response = await self.dispatcher.dispatch(user_id=user_id, text=text)
-        if response:
-            await self.client.send_message(user_id, response)
-
-    def stop(self):
-        """Останавливает бота."""
-        self._running = False

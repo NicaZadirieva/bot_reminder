@@ -20,7 +20,6 @@ from app.application.services.reminder_scheduler import ReminderScheduler
 from vkbottle import Bot as VkBot
 
 from app.presentation.vk_bot_controller import VkBotController
-from app.presentation.vk_client import VKClient
 
 
 def setup_logger():
@@ -73,12 +72,13 @@ async def main():
 
 async def main2():
     setup_logger()
-    async with async_session() as session:
+    session = async_session()
+    try:
         repo = ReminderRepository(session, PlatformDb.VK)
         reminder_service = ReminderService(repo)
 
-        vk_client = VKClient(token=settings.vk_app.VK_API_TOKEN)
-        bot_adapter = VkBotAdapter(vk_client)  # адаптер использует VKClient
+        vk_bot = VkBot(token=settings.vk_app.VK_API_TOKEN)
+        bot_adapter = VkBotAdapter(vk_bot)
 
         reminder_parser = ReminderParser(PlatformEntity.VK)
         reminder_scheduler = ReminderScheduler(
@@ -89,12 +89,15 @@ async def main2():
         )
 
         controller = VkBotController(
-            vk_client=vk_client,
+            vk_bot=vk_bot,
             reminder_dispatcher=reminder_dispatcher,
             reminder_scheduler=reminder_scheduler,
         )
 
+        # Запускаем бота (асинхронный метод)
         await controller.start()
+    finally:
+        await session.close()
 
 
 if __name__ == "__main__":

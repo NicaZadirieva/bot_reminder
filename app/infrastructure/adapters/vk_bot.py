@@ -1,12 +1,12 @@
+from vkbottle import Bot as VkBot
 from app.core.bot import Bot
-from app.presentation.vk_client import VKClient
 
 
 class VkBotAdapter(Bot):
-    """Адаптер, приводящий VKClient к интерфейсу Bot."""
+    """Адаптер, приводящий vkbottle.Bot к интерфейсу Bot."""
 
-    def __init__(self, vk_client: VKClient):
-        self._vk_client = vk_client
+    def __init__(self, vk_bot: VkBot):
+        self._vk_bot = vk_bot
 
     async def send_message(self, chat_id: int, text: str, **kwargs) -> None:
         """
@@ -14,11 +14,7 @@ class VkBotAdapter(Bot):
 
         :param chat_id: Идентификатор пользователя (peer_id).
         :param text: Текст сообщения.
-        :param kwargs: Дополнительные параметры:
-            - keyboard (dict): клавиатура для сообщения.
-            - (в будущем можно добавить другие параметры VK API).
+        :param kwargs: Дополнительные параметры для vk_api.messages.send
+                       (например, random_id, attachment и т.д.).
         """
-        keyboard = kwargs.get("keyboard")
-        await self._vk_client.send_message(
-            user_id=chat_id, message=text, keyboard=keyboard
-        )
+        await self._vk_bot.api.messages.send(peer_id=chat_id, message=text, **kwargs)
