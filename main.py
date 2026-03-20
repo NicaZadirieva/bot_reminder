@@ -5,15 +5,22 @@ import yaml
 from pathlib import Path
 from aiogram import Bot as AiogramBot
 from pytz import timezone
+from app.application.domain.entities import PlatformEntity
+from app.application.utils.parsers.reminder_parser import ReminderParser
 from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.core import settings
 from app.core.db import async_session
+from app.infrastructure.adapters.vk_bot import VkBotAdapter
 from app.presentation.command_dispatcher import ReminderDispatcher
 from app.presentation.telegram_bot_controller import TelegramBotController
 from app.infrastructure.repositories import ReminderRepository
 from app.application.services.reminder_service import ReminderService
-
+from app.infrastructure.database import PlatformDb
 from app.application.services.reminder_scheduler import ReminderScheduler
+from vkbottle import Bot as VkBot
+
+from app.presentation.vk_bot_controller import VkBotController
+from app.presentation.vk_client import VKClient
 
 
 def setup_logger():
@@ -21,7 +28,7 @@ def setup_logger():
     Настройка логирования на основе log_conf.yaml и параметров из .env.
     """
     # Получаем параметры из настроек
-    environment = settings.app.ENVIRONMENT.lower()
+    environment = settings.common_app.ENVIRONMENT.lower()
 
     # Создаём директорию для логов, если её нет
     logs_dir = Path("logs")
@@ -43,15 +50,17 @@ def setup_logger():
 async def main():
     setup_logger()
     async with async_session() as session:
-        repo = ReminderRepository(session)
+        repo = ReminderRepository(session, PlatformDb.TELEGRAM)
         reminder_service = ReminderService(repo)
-        aiogram_bot = AiogramBot(token=settings.app.BOT_TOKEN)
+        aiogram_bot = AiogramBot(token=settings.tg_app.TG_BOT_TOKEN)
         bot_adapter = AiogramBotAdapter(aiogram_bot)
-
+        reminder_parser = ReminderParser(PlatformEntity.TELEGRAM)
         reminder_scheduler = ReminderScheduler(
-            reminder_service, bot_adapter, timezone(settings.app.TIMEZONE)
+            reminder_service, bot_adapter, timezone(settings.common_app.TIMEZONE)
         )
-        reminder_dispatcher = ReminderDispatcher(reminder_service, reminder_scheduler)
+        reminder_dispatcher = ReminderDispatcher(
+            reminder_service, reminder_scheduler, reminder_parser
+        )
 
         controller = TelegramBotController(
             aiogram_bot=aiogram_bot,
@@ -62,5 +71,31 @@ async def main():
         await controller.start()
 
 
+async def main2():
+    setup_logger()
+    async with async_session() as session:
+        repo = ReminderRepository(session, PlatformDb.VK)
+        reminder_service = ReminderService(repo)
+
+        vk_client = VKClient(token=settings.vk_app.VK_API_TOKEN)
+        bot_adapter = VkBotAdapter(vk_client)  # адаптер использует VKClient
+
+        reminder_parser = ReminderParser(PlatformEntity.VK)
+        reminder_scheduler = ReminderScheduler(
+            reminder_service, bot_adapter, timezone(settings.common_app.TIMEZONE)
+        )
+        reminder_dispatcher = ReminderDispatcher(
+            reminder_service, reminder_scheduler, reminder_parser
+        )
+
+        controller = VkBotController(
+            vk_client=vk_client,
+            reminder_dispatcher=reminder_dispatcher,
+            reminder_scheduler=reminder_scheduler,
+        )
+
+        await controller.start()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main2())

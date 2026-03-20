@@ -4,12 +4,20 @@ from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class AppSettings(BaseModel):
-    BOT_TOKEN: str = Field(
-        ..., min_length=10, description="Bot token from @BotFather or from VK_API"
-    )
+class CommonAppSettings(BaseModel):
     ENVIRONMENT: str = "development"
     TIMEZONE: str = "Europe/Moscow"
+
+
+class TgAppSettings(BaseModel):
+    TG_BOT_TOKEN: str = Field(
+        ..., min_length=10, description="Bot token from @BotFather"
+    )
+
+
+class VkAppSettings(BaseModel):
+    VK_API_TOKEN: str = Field(..., min_length=10, description="API token from VK API")
+    VK_GROUP_ID: int
 
 
 class DatabaseSettings(BaseModel):
@@ -40,9 +48,17 @@ class DatabaseSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    BOT_TOKEN: str = Field(..., min_length=10)
+    # Telegram
+    TG_BOT_TOKEN: str = Field(..., min_length=10)
+    # VK
+    VK_API_TOKEN: str = Field(..., min_length=10)
+    VK_GROUP_ID: int
+
+    # Database
     DATABASE_URL: str = Field(..., min_length=10)
     DATABASE_URL_SYNC: str = Field(..., min_length=10)
+
+    # Common
     ENVIRONMENT: str = "development"
     TIMEZONE: str = "Europe/Moscow"
 
@@ -61,11 +77,20 @@ class Settings(BaseSettings):
         return v
 
     @property
-    def app(self) -> AppSettings:
-        return AppSettings(
-            BOT_TOKEN=self.BOT_TOKEN,
+    def common_app(self) -> CommonAppSettings:
+        return CommonAppSettings(
             ENVIRONMENT=self.ENVIRONMENT,
             TIMEZONE=self.TIMEZONE,
+        )
+
+    @property
+    def tg_app(self) -> TgAppSettings:
+        return TgAppSettings(TG_BOT_TOKEN=self.TG_BOT_TOKEN)
+
+    @property
+    def vk_app(self) -> VkAppSettings:
+        return VkAppSettings(
+            VK_API_TOKEN=self.VK_API_TOKEN, VK_GROUP_ID=self.VK_GROUP_ID
         )
 
     @property

@@ -14,10 +14,14 @@ class CreateReminderCommand(CommandUseCase):
     """
 
     def __init__(
-        self, reminder_service: ReminderService, reminder_scheduler: ReminderScheduler
+        self,
+        reminder_service: ReminderService,
+        reminder_scheduler: ReminderScheduler,
+        reminder_parser: ReminderParser,
     ):
         self.reminder_service = reminder_service
         self.reminder_scheduler = reminder_scheduler
+        self.reminder_parser = reminder_parser
 
     async def execute(self, user_id: int, args=None, **kwargs) -> str:
         """
@@ -33,7 +37,7 @@ class CreateReminderCommand(CommandUseCase):
 
         # Парсим текст в объект напоминания
         try:
-            reminder = ReminderParser.parse(args, user_id)
+            reminder = self.reminder_parser.parse(args, user_id)
         except Exception as e:
             logger.error(f"Ошибка парсинга напоминания: {e}")
             return "❌ Формат данных не соответствует команде. Проверьте правильность ввода."

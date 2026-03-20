@@ -24,12 +24,18 @@ class RepeatedValueEntity(Enum):
     YEARLY = "yearly"
 
 
+class PlatformEntity(Enum):
+    VK = "VK"
+    TELEGRAM = "TELEGRAM"
+    MAX = "MAX"
+
+
 @dataclass
 class ReminderEntity:
-    telegram_id: int
+    user_id: int
     text: str
     remind_at: datetime
-
+    platform: PlatformEntity
     id: Optional[int] = None
     priority: PriorityEntity = PriorityEntity.MEDIUM
     status: StatusEntity = StatusEntity.ACTIVE

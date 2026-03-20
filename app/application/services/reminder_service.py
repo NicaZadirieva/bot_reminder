@@ -26,7 +26,7 @@ class ReminderService:
     def __filter_reminders_by_user__(
         self, reminders: List[ReminderDb], user_id: int
     ) -> List[ReminderEntity]:
-        return [from_model_to_entity(r) for r in reminders if r.telegram_id == user_id]
+        return [from_model_to_entity(r) for r in reminders if r.user_id == user_id]
 
     async def get_all_reminders(self, user_id: int) -> List[ReminderEntity]:
         all_reminders = await self.reminderRepo.get_all()
