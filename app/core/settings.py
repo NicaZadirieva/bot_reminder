@@ -1,6 +1,7 @@
+from typing import Optional
 from urllib.parse import urlparse
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,14 +11,14 @@ class CommonAppSettings(BaseModel):
 
 
 class TgAppSettings(BaseModel):
-    TG_BOT_TOKEN: str = Field(
-        ..., min_length=10, description="Bot token from @BotFather"
-    )
+    TG_BOT_TOKEN: Optional[str] = None
+    TG_RUN: bool = False
 
 
 class VkAppSettings(BaseModel):
-    VK_API_TOKEN: str = Field(..., min_length=10, description="API token from VK API")
-    VK_GROUP_ID: int
+    VK_API_TOKEN: Optional[str] = None
+    VK_GROUP_ID: Optional[str] = None
+    VK_RUN: bool = False
 
 
 class DatabaseSettings(BaseModel):
@@ -49,11 +50,12 @@ class DatabaseSettings(BaseModel):
 
 class Settings(BaseSettings):
     # Telegram
-    TG_BOT_TOKEN: str = Field(..., min_length=10)
+    TG_BOT_TOKEN: Optional[str] = None
+    TG_RUN: bool = False
     # VK
-    VK_API_TOKEN: str = Field(..., min_length=10)
-    VK_GROUP_ID: int
-
+    VK_API_TOKEN: Optional[str] = None
+    VK_GROUP_ID: Optional[str] = None
+    VK_RUN: bool = False
     # Database
     DATABASE_URL: str = Field(..., min_length=10)
     DATABASE_URL_SYNC: str = Field(..., min_length=10)
@@ -76,6 +78,18 @@ class Settings(BaseSettings):
             raise ValueError(f"ENVIRONMENT must be one of {allowed}")
         return v
 
+    @model_validator(mode="after")
+    def validate_correct_running(self):
+        if self.VK_RUN:
+            if not self.VK_API_TOKEN or not self.VK_GROUP_ID:
+                raise ValueError("VK_API_TOKEN and VK_GROUP_ID must be provided")
+            if not self.VK_GROUP_ID.isdigit():
+                raise ValueError("VK_GROUP_ID must be correct number")
+        if self.TG_RUN:
+            if not self.TG_BOT_TOKEN:
+                raise ValueError("TG_BOT_TOKEN must be provided")
+        return self
+
     @property
     def common_app(self) -> CommonAppSettings:
         return CommonAppSettings(
@@ -85,12 +99,14 @@ class Settings(BaseSettings):
 
     @property
     def tg_app(self) -> TgAppSettings:
-        return TgAppSettings(TG_BOT_TOKEN=self.TG_BOT_TOKEN)
+        return TgAppSettings(TG_BOT_TOKEN=self.TG_BOT_TOKEN, TG_RUN=self.TG_RUN)
 
     @property
     def vk_app(self) -> VkAppSettings:
         return VkAppSettings(
-            VK_API_TOKEN=self.VK_API_TOKEN, VK_GROUP_ID=self.VK_GROUP_ID
+            VK_API_TOKEN=self.VK_API_TOKEN,
+            VK_GROUP_ID=self.VK_GROUP_ID,
+            VK_RUN=self.VK_RUN,
         )
 
     @property

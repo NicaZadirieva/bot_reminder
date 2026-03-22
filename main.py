@@ -17,7 +17,6 @@ from app.infrastructure.repositories import ReminderRepository
 from app.application.services.reminder_service import ReminderService
 from app.infrastructure.database import PlatformDb
 from app.application.services.reminder_scheduler import ReminderScheduler
-from vkbottle import Bot as VkBot
 
 from app.presentation.vk_bot_controller import VkBotController
 from app.presentation.vk_client import VKClient
@@ -47,12 +46,12 @@ def setup_logger():
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
 
-async def main():
+async def run_tg_bot():
     setup_logger()
     async with async_session() as session:
         repo = ReminderRepository(session, PlatformDb.TELEGRAM)
         reminder_service = ReminderService(repo)
-        aiogram_bot = AiogramBot(token=settings.tg_app.TG_BOT_TOKEN)
+        aiogram_bot = AiogramBot(token=settings.tg_app.TG_BOT_TOKEN)  # type: ignore
         bot_adapter = AiogramBotAdapter(aiogram_bot)
         reminder_parser = ReminderParser(PlatformEntity.TELEGRAM)
         reminder_scheduler = ReminderScheduler(
@@ -71,14 +70,14 @@ async def main():
         await controller.start()
 
 
-async def main2():
+async def run_vk_bot():
     setup_logger()
 
     async with async_session() as session:
         repo = ReminderRepository(session, PlatformDb.VK)
         reminder_service = ReminderService(repo)
 
-        vk_client = VKClient(token=settings.vk_app.VK_API_TOKEN)
+        vk_client = VKClient(token=settings.vk_app.VK_API_TOKEN)  # type: ignore
         bot_adapter = VkBotAdapter(vk_client)
 
         reminder_parser = ReminderParser(PlatformEntity.VK)
@@ -99,4 +98,7 @@ async def main2():
 
 
 if __name__ == "__main__":
-    asyncio.run(main2())
+    if settings.vk_app.VK_RUN:
+        asyncio.run(run_vk_bot())
+    if settings.tg_app.TG_RUN:
+        asyncio.run(run_tg_bot())
