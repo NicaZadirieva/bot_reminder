@@ -80,6 +80,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_correct_running(self):
+        if self.VK_RUN and self.TG_RUN:
+            raise ValueError("Cannot run several bots on one server:port")
         if self.VK_RUN:
             if not self.VK_API_TOKEN or not self.VK_GROUP_ID:
                 raise ValueError("VK_API_TOKEN and VK_GROUP_ID must be provided")

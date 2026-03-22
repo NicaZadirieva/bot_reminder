@@ -1,5 +1,4 @@
 ﻿import asyncio
-from pathlib import Path
 from aiogram import Bot as AiogramBot
 from pytz import timezone
 from app.application.domain.entities import PlatformEntity
