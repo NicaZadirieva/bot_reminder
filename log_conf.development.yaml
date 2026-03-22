@@ -12,10 +12,18 @@ handlers:
     class: logging.StreamHandler
     stream: ext://sys.stdout
     formatter: default
-  file:
+  vk_file:
     class: logging.handlers.TimedRotatingFileHandler
     encoding: utf-8
-    filename: logs/app_dev.log
+    filename: logs/vk_logs/dev/app_dev.log
+    formatter: default
+    when: "midnight" # ротация в полночь
+    interval: 1 # интервал (в единицах when)
+    backupCount: 7 # хранить 7 старых файлов
+  tg_file:
+    class: logging.handlers.TimedRotatingFileHandler
+    encoding: utf-8
+    filename: logs/tg_logs/dev/app_dev.log
     formatter: default
     when: "midnight" # ротация в полночь
     interval: 1 # интервал (в единицах when)
@@ -23,5 +31,4 @@ handlers:
 
 root:
   level: DEBUG
-  handlers: [console, file] # теперь логи пишутся и в консоль, и в файл
-
+  handlers: [console, vk_file, tg_file] # теперь логи пишутся и в консоль, и в файл

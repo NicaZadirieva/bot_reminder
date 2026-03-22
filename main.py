@@ -1,11 +1,9 @@
 ﻿import asyncio
-import logging
-import logging.config
-import yaml
 from pathlib import Path
 from aiogram import Bot as AiogramBot
 from pytz import timezone
 from app.application.domain.entities import PlatformEntity
+from app.application.utils.LoggerUtils import LoggerUtils
 from app.application.utils.parsers.reminder_parser import ReminderParser
 from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
 from app.core import settings
@@ -22,32 +20,7 @@ from app.presentation.vk_bot_controller import VkBotController
 from app.presentation.vk_client import VKClient
 
 
-def setup_logger():
-    """
-    Настройка логирования на основе log_conf.yaml и параметров из .env.
-    """
-    # Получаем параметры из настроек
-    environment = settings.common_app.ENVIRONMENT.lower()
-
-    # Создаём директорию для логов, если её нет
-    logs_dir = Path("logs")
-    logs_dir.mkdir(exist_ok=True)
-
-    # Загружаем конфигурацию из YAML
-    config_path = Path(f"log_conf.{environment}.yaml")  # или укажите полный путь
-    with open(config_path, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
-
-    # Применяем конфигурацию
-    logging.config.dictConfig(config)
-
-    # 4. Отдельная настройка уровней для сторонних библиотек
-    logging.getLogger("apscheduler").setLevel(logging.WARNING)
-    logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
-
-
 async def run_tg_bot():
-    setup_logger()
     async with async_session() as session:
         repo = ReminderRepository(session, PlatformDb.TELEGRAM)
         reminder_service = ReminderService(repo)
@@ -71,8 +44,6 @@ async def run_tg_bot():
 
 
 async def run_vk_bot():
-    setup_logger()
-
     async with async_session() as session:
         repo = ReminderRepository(session, PlatformDb.VK)
         reminder_service = ReminderService(repo)
@@ -98,6 +69,8 @@ async def run_vk_bot():
 
 
 if __name__ == "__main__":
+    LoggerUtils.setup_logger()
+
     if settings.vk_app.VK_RUN:
         asyncio.run(run_vk_bot())
     if settings.tg_app.TG_RUN:
