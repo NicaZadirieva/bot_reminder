@@ -52,7 +52,7 @@ class CancelReminderCommand(CommandUseCase):
             await self.reminder_scheduler.cancel_reminder_job(reminder_id, user_id)
         except Exception:
             logger.error(
-                "Напоминание #{reminder_id} отменено, но возникла проблема при удалении из планировщика. Обратитесь в поддержку, если напоминание продолжит приходить.",
+                "Напоминание #{reminder_id} отменено, но возникла проблема при удалении из планировщика",
                 exc_info=True,
             )
 
