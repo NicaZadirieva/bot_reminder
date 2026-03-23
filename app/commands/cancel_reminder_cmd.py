@@ -34,7 +34,17 @@ class CancelReminderCommand(CommandUseCase):
         try:
             reminder_id = int(args.strip().split()[0])
         except ValueError:
+            logger.warning(
+                "Юзер пытается отменить напоминание с неправильно написанным id"
+            )
             return "❌ ID должен быть числом"
+
+        is_completed_reminder = await self.reminder_service.is_completed_reminder(
+            reminder_id, user_id
+        )
+        if is_completed_reminder:
+            logger.warning("Юзер пытается отменить завершенное напоминание")
+            return f"❌ Напоминание #{reminder_id} уже завершено"
 
         # Пытаемся отменить напоминание в базе данных
         updated = await self.reminder_service.cancel_reminder_by_id(
@@ -42,7 +52,7 @@ class CancelReminderCommand(CommandUseCase):
         )
 
         if not updated:
-            return f"❌ Напоминание #{reminder_id} не найдено или уже отменено"
+            return f"❌ Напоминание #{reminder_id} не найдено"
 
         # Если в базе отменили успешно, пробуем удалить задачу из планировщика
         try:
