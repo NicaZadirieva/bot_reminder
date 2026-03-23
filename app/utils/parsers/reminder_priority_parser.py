@@ -1,13 +1,10 @@
 from typing import Optional
 from app.entities import PriorityEntity
-from app.utils.translators.TranslatorMixin import (
-    FromRuTranslatorMixin,
-)
 
 
-class ReminderPriorityParser(FromRuTranslatorMixin):
+class ReminderPriorityParser:
     @staticmethod
-    def parseReminderPriority(priority: str) -> Optional[str]:
+    def parseReminderPriority(priority: str) -> Optional[PriorityEntity]:
         if not priority or not isinstance(priority, str):
             return None
 

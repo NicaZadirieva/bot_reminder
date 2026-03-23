@@ -3,7 +3,7 @@ from pytz import timezone
 import logging
 from functools import partial
 
-from app.services import ReminderService
+from .reminder_service import ReminderService
 from app.utils.TimeUtils import TimeUtils
 from app.entities import ReminderEntity, RepeatedValueEntity
 from app.core import Bot, settings
