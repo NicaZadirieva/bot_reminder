@@ -1,4 +1,4 @@
-from app.models import RepeatedValue
+from app.domain import RepeatedValue
 
 
 class ReminderFrequencyParser:

@@ -6,7 +6,7 @@
 Полный набор unit и интеграционных тестов для парсера напоминаний
 """
 
-from app.models import (
+from app.domain import (
     Priority,
     Status,
     RepeatedValue,

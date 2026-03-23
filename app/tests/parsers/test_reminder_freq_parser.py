@@ -1,7 +1,7 @@
 import pytest
 
 from app.utils.parsers.reminder_freq_parser import ReminderFrequencyParser
-from app.models import RepeatedValue
+from app.domain import RepeatedValue
 # ============ ТЕСТЫ parseReminderFrequency ============
 
 

@@ -1,7 +1,7 @@
 ﻿import asyncio
 from aiogram import Bot as AiogramBot
 
-from app.models import Platform
+from app.domain import Platform
 from app.utils.LoggerUtils import LoggerUtils
 from app.utils.parsers import ReminderParser
 from app.adapters import AiogramBotAdapter, VkBotAdapter

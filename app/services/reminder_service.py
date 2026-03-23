@@ -3,7 +3,7 @@ from app.utils.mappers import from_entity_to_model, from_model_to_entity
 from app.repositories import ReminderRepository
 from typing import Optional, List
 
-from app.models import Reminder
+from app.domain import Reminder
 from app.entities import ReminderDb, RepeatedValueDb, StatusDb
 
 

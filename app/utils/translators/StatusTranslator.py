@@ -1,4 +1,4 @@
-from app.models import Status
+from app.domain import Status
 
 
 class StatusTranslator:

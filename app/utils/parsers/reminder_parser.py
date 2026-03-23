@@ -1,4 +1,4 @@
-﻿from app.models import (
+﻿from app.domain import (
     Platform,
     Reminder,
     Priority,

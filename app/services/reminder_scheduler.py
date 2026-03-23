@@ -5,7 +5,7 @@ from functools import partial
 
 from .reminder_service import ReminderService
 from app.utils.TimeUtils import TimeUtils
-from app.models import Reminder, RepeatedValue
+from app.domain import Reminder, RepeatedValue
 from app.core import Bot, settings
 
 logger = logging.getLogger(__name__)

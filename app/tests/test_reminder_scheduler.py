@@ -7,7 +7,7 @@ from functools import partial
 
 from app.services import ReminderScheduler
 from app.services import ReminderService
-from app.models import (
+from app.domain import (
     Reminder,
     Status,
     RepeatedValue,

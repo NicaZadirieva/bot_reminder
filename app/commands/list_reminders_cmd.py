@@ -1,6 +1,6 @@
 ﻿from typing import List
 
-from app.models import Reminder
+from app.domain import Reminder
 from app.services import ReminderService
 from app.utils.translators.StatusTranslator import StatusTranslator
 from app.utils.translators.FreqTranslator import FreqTranslator

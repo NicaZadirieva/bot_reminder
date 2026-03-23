@@ -1,5 +1,5 @@
 from typing import Optional
-from app.models import Priority
+from app.domain import Priority
 
 
 class ReminderPriorityParser:

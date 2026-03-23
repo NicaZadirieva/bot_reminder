@@ -5,7 +5,7 @@ import pytest
 from app.utils.parsers.reminder_priority_parser import (
     ReminderPriorityParser,
 )
-from app.models import Priority
+from app.domain import Priority
 
 # ============ ТЕСТЫ parseReminderPriority ============
 
