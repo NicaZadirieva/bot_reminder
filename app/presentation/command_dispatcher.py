@@ -12,10 +12,12 @@ class ReminderDispatcher:
     определяет команду и делегирует выполнение соответствующему use case.
     """
 
-    def __init__(self, reminder_service, reminder_scheduler):
+    def __init__(self, reminder_service, reminder_scheduler, reminder_parser):
         # Создаём экземпляры команд с необходимыми зависимостями
         self._commands = {
-            "/remind": CreateReminderCommand(reminder_service, reminder_scheduler),
+            "/remind": CreateReminderCommand(
+                reminder_service, reminder_scheduler, reminder_parser
+            ),
             "/cancel_reminder": CancelReminderCommand(
                 reminder_service, reminder_scheduler
             ),

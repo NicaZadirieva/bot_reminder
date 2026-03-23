@@ -3,11 +3,7 @@ from .models import (
     Status as StatusDb,
     RepeatedValue as RepeatedValueDb,
     Reminder as ReminderDb,
+    Platform as PlatformDb,
 )
 
-__all__ = [
-    "PriorityDb",
-    "StatusDb",
-    "RepeatedValueDb",
-    "ReminderDb",
-]
+__all__ = ["PriorityDb", "StatusDb", "RepeatedValueDb", "ReminderDb", "PlatformDb"]

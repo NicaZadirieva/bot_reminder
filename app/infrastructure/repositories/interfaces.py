@@ -1,11 +1,16 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Generic, TypeVar
+from app.infrastructure.database import PlatformDb
+from dataclasses import dataclass
 
 T = TypeVar("T")
 
 
+@dataclass
 class IRepository(ABC, Generic[T]):
     """Base repo"""
+
+    platform: PlatformDb
 
     @abstractmethod
     async def get_by_id(self, id: int) -> Optional[T]:

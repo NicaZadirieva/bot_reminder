@@ -82,7 +82,7 @@ class ReminderScheduler:
 
             # Отправить сообщение
             await self.bot.send_message(
-                chat_id=reminder.telegram_id, text=f"🔔 НАПОМИНАНИЕ!\n\n{reminder.text}"
+                chat_id=reminder.user_id, text=f"🔔 НАПОМИНАНИЕ!\n\n{reminder.text}"
             )
 
             logger.info(f"✅ Напоминание #{reminder.id} отправлено")

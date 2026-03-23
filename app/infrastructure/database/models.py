@@ -27,11 +27,17 @@ class RepeatedValue(PyEnum):
     YEARLY = "YEARLY"
 
 
+class Platform(PyEnum):
+    VK = "VK"
+    TELEGRAM = "TELEGRAM"
+    MAX = "MAX"
+
+
 class Reminder(Base):
     __tablename__ = "reminders"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    telegram_id: Mapped[int] = mapped_column(Integer)
+    user_id: Mapped[int] = mapped_column(Integer)
     text: Mapped[str] = mapped_column(String(200), nullable=False)
     remind_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     priority: Mapped[Priority] = mapped_column(Enum(Priority), default=Priority.MEDIUM)
@@ -42,3 +48,4 @@ class Reminder(Base):
         nullable=False,
         default=RepeatedValue.ONCE,
     )
+    platform: Mapped[Platform] = mapped_column(Enum(Platform), nullable=False)

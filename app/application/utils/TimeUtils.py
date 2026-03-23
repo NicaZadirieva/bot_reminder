@@ -8,7 +8,7 @@ class TimeUtils:
     @staticmethod
     def get_now() -> datetime:
         """Получить текущее время"""
-        tz = timezone(settings.app.TIMEZONE)
+        tz = timezone(settings.common_app.TIMEZONE)
         now = datetime.now(tz)
         return now
 
@@ -16,7 +16,7 @@ class TimeUtils:
     def _make_aware(dt: datetime) -> datetime:
         # TODO: подумать как переименовать
         """Конвертировать naive datetime в timezone-aware"""
-        tz = timezone(settings.app.TIMEZONE)
+        tz = timezone(settings.common_app.TIMEZONE)
         if dt.tzinfo is None:
             return tz.localize(dt)
         return dt

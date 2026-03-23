@@ -12,15 +12,23 @@ handlers:
     class: logging.StreamHandler
     stream: ext://sys.stdout
     formatter: default
-  file:
+  vk_file:
     class: logging.handlers.TimedRotatingFileHandler
     encoding: utf-8
+    filename: vk_logs/prod/app_prod.log
     formatter: default
-    filename: logs/app_prod.log
+    when: "midnight" # ротация в полночь
+    interval: 1 # интервал (в единицах when)
+    backupCount: 7 # хранить 7 старых файлов
+  tg_file:
+    class: logging.handlers.TimedRotatingFileHandler
+    encoding: utf-8
+    filename: tg_logs/prod/app_prod.log
+    formatter: default
     when: "midnight" # ротация в полночь
     interval: 1 # интервал (в единицах when)
     backupCount: 7 # хранить 7 старых файлов
 
 root:
   level: INFO
-  handlers: [console, file] # теперь логи пишутся и в консоль, и в файл
+  handlers: [console, vk_file, tg_file] # теперь логи пишутся и в консоль, и в файл
