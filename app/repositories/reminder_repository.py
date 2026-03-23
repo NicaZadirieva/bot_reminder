@@ -1,17 +1,14 @@
-# PostgreSQL impl
 from sqlalchemy import select
-from app.infrastructure.repositories.interfaces import IRepository
+from app.models.models import Reminder as ReminderDb, Platform as PlatformDb
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.infrastructure.database import PlatformDb
+from .repository_interface import IRepository
 
 
-class PostgresRepository(IRepository):
-    """PostgreSQL"""
-
-    def __init__(self, model_class, db_session: AsyncSession, platform: PlatformDb):
-        super().__init__(platform)
-        self.model = model_class
+class ReminderRepository(IRepository):
+    def __init__(self, db_session: AsyncSession, platform: PlatformDb):
         self.db_session = db_session
+        self.platform = platform
+        self.model = ReminderDb
 
     async def get_by_id(self, id: int):
         """Получение записи по id с проверкой платформы."""

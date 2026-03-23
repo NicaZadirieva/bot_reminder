@@ -1,10 +1,10 @@
-from app.application.domain.entities import ReminderEntity
-from app.infrastructure.database import (
-    ReminderDb,
-    RepeatedValueDb,
-    StatusDb,
-    PriorityDb,
-    PlatformDb,
+from app.entities.entities import ReminderEntity
+from app.models.models import (
+    Reminder as ReminderDb,
+    RepeatedValue as RepeatedValueDb,
+    Status as StatusDb,
+    Priority as PriorityDb,
+    Platform as PlatformDb,
 )
 
 

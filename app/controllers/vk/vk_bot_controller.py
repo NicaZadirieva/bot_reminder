@@ -2,9 +2,9 @@ import asyncio
 import logging
 from typing import Dict, Any
 
-from app.presentation.command_dispatcher import ReminderDispatcher
-from app.application.services.reminder_scheduler import ReminderScheduler
-from app.presentation.vk_client import VKClient
+from app.commands.dispatchers.remind_dispatcher import ReminderDispatcher
+from app.services.reminder_scheduler import ReminderScheduler
+from app.controllers.vk.vk_client import VKClient
 
 logger = logging.getLogger(__name__)
 

@@ -1,22 +1,22 @@
 ﻿import asyncio
 from aiogram import Bot as AiogramBot
 from pytz import timezone
-from app.application.domain.entities import PlatformEntity
-from app.application.utils.LoggerUtils import LoggerUtils
-from app.application.utils.parsers.reminder_parser import ReminderParser
-from app.infrastructure.adapters.aiogram_bot import AiogramBotAdapter
+from app.entities.entities import PlatformEntity
+from app.utils.LoggerUtils import LoggerUtils
+from app.utils.parsers.reminder_parser import ReminderParser
+from app.adapters.aiogram_bot import AiogramBotAdapter
 from app.core import settings
 from app.core.db import async_session
-from app.infrastructure.adapters.vk_bot import VkBotAdapter
-from app.presentation.command_dispatcher import ReminderDispatcher
-from app.presentation.telegram_bot_controller import TelegramBotController
-from app.infrastructure.repositories import ReminderRepository
-from app.application.services.reminder_service import ReminderService
-from app.infrastructure.database import PlatformDb
-from app.application.services.reminder_scheduler import ReminderScheduler
+from app.adapters.vk_bot import VkBotAdapter
+from app.commands.dispatchers.remind_dispatcher import ReminderDispatcher
+from app.controllers.telegram.telegram_bot_controller import TelegramBotController
+from app.repositories.reminder_repository import ReminderRepository
+from app.services.reminder_service import ReminderService
+from app.models.models import Platform as PlatformDb
+from app.services.reminder_scheduler import ReminderScheduler
 
-from app.presentation.vk_bot_controller import VkBotController
-from app.presentation.vk_client import VKClient
+from app.controllers.vk.vk_bot_controller import VkBotController
+from app.controllers.vk.vk_client import VKClient
 
 
 async def run_tg_bot():

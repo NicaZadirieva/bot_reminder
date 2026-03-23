@@ -1,13 +1,13 @@
-﻿from app.application.domain.entities import ReminderEntity, RepeatedValueEntity
-from app.core.settings import Settings
+﻿from app.utils.TimeUtils import TimeUtils
+from app.entities.entities import ReminderEntity, RepeatedValueEntity
 from app.core.bot import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import logging
 from functools import partial
 
-from app.application.services.reminder_service import ReminderService
-from ..utils.TimeUtils import TimeUtils
+from app.services.reminder_service import ReminderService
+
 
 logger = logging.getLogger(__name__)
 

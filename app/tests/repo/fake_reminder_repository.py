@@ -1,6 +1,6 @@
 ﻿from .fake_repository import IFakeRepository
 from typing import Optional, List, Any
-from app.database import ReminderDb
+from app.models.models import Reminder as ReminderDb
 
 from datetime import datetime, timedelta
 

@@ -1,8 +1,8 @@
 import logging
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
-from app.presentation.command_dispatcher import ReminderDispatcher
-from app.application.services.reminder_scheduler import ReminderScheduler
+from app.commands.dispatchers.remind_dispatcher import ReminderDispatcher
+from app.services.reminder_scheduler import ReminderScheduler
 
 logger = logging.getLogger(__name__)
 

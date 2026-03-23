@@ -1,8 +1,8 @@
-from app.application.commands.create_reminder_cmd import CreateReminderCommand
-from app.application.commands.cancel_reminder_cmd import CancelReminderCommand
-from app.application.commands.list_reminders_cmd import ListRemindersCommand
-from app.application.commands.start_cmd import StartCommand
-from app.application.commands.help_cmd import HelpCommand
+from app.commands.create_reminder_cmd import CreateReminderCommand
+from app.commands.cancel_reminder_cmd import CancelReminderCommand
+from app.commands.list_reminders_cmd import ListRemindersCommand
+from app.commands.start_cmd import StartCommand
+from app.commands.help_cmd import HelpCommand
 
 
 class ReminderDispatcher:

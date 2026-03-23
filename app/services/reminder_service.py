@@ -1,12 +1,16 @@
 ﻿# Business logics
-from app.application.utils.mappers import from_entity_to_model, from_model_to_entity
-from app.infrastructure.repositories import ReminderRepository
+from app.utils.mappers import from_entity_to_model, from_model_to_entity
+from app.repositories.reminder_repository import ReminderRepository
 from typing import Optional, List
 
-from app.application.domain.entities import ReminderEntity
-from app.infrastructure.database import ReminderDb, RepeatedValueDb, StatusDb
+from app.entities.entities import ReminderEntity
+from app.models.models import (
+    Reminder as ReminderDb,
+    RepeatedValue as RepeatedValueDb,
+    Status as StatusDb,
+)
 
-from app.application.utils.TimeUtils import TimeUtils
+from app.utils.TimeUtils import TimeUtils
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +22,7 @@ class ReminderService:
 
     async def check_if_reminder_exists(self, id: int, user_id: int) -> bool:
         reminderDb = await self.reminderRepo.get_by_id(id)
-        if reminderDb and reminderDb.telegram_id != user_id:
+        if reminderDb and reminderDb.user_id != user_id:
             # напоминание не принадлежит пользователю
             return False
         return reminderDb is not None
