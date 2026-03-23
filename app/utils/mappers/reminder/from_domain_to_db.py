@@ -8,7 +8,7 @@ from app.entities import (
 )
 
 
-def from_entity_to_model(entity: Reminder) -> ReminderDb:
+def from_domain_to_db(entity: Reminder) -> ReminderDb:
     return ReminderDb(
         id=entity.id,
         user_id=entity.user_id,

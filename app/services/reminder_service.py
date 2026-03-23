@@ -1,5 +1,5 @@
 ﻿# Business logics
-from app.utils.mappers import from_entity_to_model, from_model_to_entity
+from app.utils.mappers.reminder import from_db_to_domain, from_domain_to_db
 from app.repositories import ReminderRepository
 from typing import Optional, List
 
@@ -27,7 +27,7 @@ class ReminderService:
     def __filter_reminders_by_user__(
         self, reminders: List[ReminderDb], user_id: int
     ) -> List[Reminder]:
-        return [from_model_to_entity(r) for r in reminders if r.user_id == user_id]
+        return [from_db_to_domain(r) for r in reminders if r.user_id == user_id]
 
     async def get_all_reminders(self, user_id: int) -> List[Reminder]:
         all_reminders = await self.reminderRepo.get_all()
@@ -48,30 +48,38 @@ class ReminderService:
             if r.repeated_value != RepeatedValueDb.ONCE
             or TimeUtils._make_aware(r.remind_at) > now
         ]
-        return [from_model_to_entity(r) for r in to_schedule]
+        return [from_db_to_domain(r) for r in to_schedule]
 
-    async def cancel_reminder_by_id(
-        self, id: int, user_id: Optional[int]
+    async def __change_status_by_id__(
+        self, id: int, user_id: Optional[int], status: StatusDb
     ) -> Reminder | None:
         if user_id is None:
-            reminderDb = await self.reminderRepo.update(id, status=StatusDb.CANCELLED)
+            reminderDb = await self.reminderRepo.update(id, status=status)
             if reminderDb is not None:
-                return from_model_to_entity(reminderDb)
+                return from_db_to_domain(reminderDb)
             else:
                 return None
         else:
             is_reminder_exists = await self.check_if_reminder_exists(id, user_id)
             if is_reminder_exists:
-                reminderDb = await self.reminderRepo.update(
-                    id, status=StatusDb.CANCELLED
-                )
+                reminderDb = await self.reminderRepo.update(id, status=status)
                 if reminderDb is not None:
-                    return from_model_to_entity(reminderDb)
+                    return from_db_to_domain(reminderDb)
                 else:
                     return None
             else:
                 return None
 
+    async def cancel_reminder_by_id(
+        self, id: int, user_id: Optional[int]
+    ) -> Reminder | None:
+        return await self.__change_status_by_id__(id, user_id, StatusDb.CANCELLED)
+
+    async def complete_reminder_by_id(
+        self, id: int, user_id: Optional[int]
+    ) -> Reminder | None:
+        return await self.__change_status_by_id__(id, user_id, StatusDb.COMPLETED)
+
     async def create_reminder(self, reminder: Reminder) -> Reminder:
-        reminderDb = await self.reminderRepo.create(from_entity_to_model(reminder))
-        return from_model_to_entity(reminderDb)
+        reminderDb = await self.reminderRepo.create(from_domain_to_db(reminder))
+        return from_db_to_domain(reminderDb)

@@ -91,7 +91,7 @@ class ReminderScheduler:
             # ⚠️ ВАЖНО: менять статус ТОЛЬКО для ONCE
             # Для DAILY/WEEKLY/MONTHLY оставляем ACTIVE
             if reminder.repeated_value == RepeatedValue.ONCE:
-                await self.reminderService.cancel_reminder_by_id(
+                await self.reminderService.complete_reminder_by_id(
                     reminder.id,  # type: ignore
                     user_id=None,
                 )
