@@ -83,11 +83,3 @@ class ReminderService:
     async def create_reminder(self, reminder: Reminder) -> Reminder:
         reminderDb = await self.reminderRepo.create(from_domain_to_db(reminder))
         return from_db_to_domain(reminderDb)
-
-    async def is_completed_reminder(self, reminder_id: int, user_id: int):
-        reminderDb = await self.reminderRepo.get_by_id(reminder_id)
-        return (
-            reminderDb
-            and reminderDb.status == StatusDb.COMPLETED
-            and reminderDb.user_id == user_id
-        )

@@ -39,13 +39,6 @@ class CancelReminderCommand(CommandUseCase):
             )
             return "❌ ID должен быть числом"
 
-        is_completed_reminder = await self.reminder_service.is_completed_reminder(
-            reminder_id, user_id
-        )
-        if is_completed_reminder:
-            logger.warning("Юзер пытается отменить завершенное напоминание")
-            return f"❌ Напоминание #{reminder_id} уже завершено"
-
         # Пытаемся отменить напоминание в базе данных
         updated = await self.reminder_service.cancel_reminder_by_id(
             reminder_id, user_id
