@@ -15,7 +15,7 @@ handlers:
   vk_file:
     class: logging.handlers.TimedRotatingFileHandler
     encoding: utf-8
-    filename: vk_logs/prod/app_prod.log
+    filename: logs/vk_logs/prod/app_prod.log
     formatter: default
     when: "midnight" # ротация в полночь
     interval: 1 # интервал (в единицах when)
@@ -23,7 +23,7 @@ handlers:
   tg_file:
     class: logging.handlers.TimedRotatingFileHandler
     encoding: utf-8
-    filename: tg_logs/prod/app_prod.log
+    filename: logs/tg_logs/prod/app_prod.log
     formatter: default
     when: "midnight" # ротация в полночь
     interval: 1 # интервал (в единицах when)
