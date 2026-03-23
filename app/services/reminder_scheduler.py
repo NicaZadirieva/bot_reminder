@@ -92,7 +92,8 @@ class ReminderScheduler:
             # Для DAILY/WEEKLY/MONTHLY оставляем ACTIVE
             if reminder.repeated_value == RepeatedValueEntity.ONCE:
                 await self.reminderService.cancel_reminder_by_id(
-                    reminder.id, user_id=None
+                    reminder.id,  # type: ignore
+                    user_id=None,
                 )
                 # Удалить из активных
                 if reminder.id in self.reminders:

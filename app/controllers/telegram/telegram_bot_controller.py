@@ -35,35 +35,40 @@ class TelegramBotController:
         @self.router.message(Command("start", "help"))
         async def handle_start_help(message: types.Message):
             response = await self.reminder_dispatcher.dispatch(
-                user_id=message.from_user.id, text=message.text or ""
+                user_id=message.from_user.id,  # type: ignore
+                text=message.text or "",
             )
             await message.answer(response)
 
         @self.router.message(Command("remind"))
         async def handle_remind(message: types.Message):
             response = await self.reminder_dispatcher.dispatch(
-                user_id=message.from_user.id, text=message.text or ""
+                user_id=message.from_user.id,  # type: ignore
+                text=message.text or "",
             )
             await message.answer(response)
 
         @self.router.message(Command("cancel_reminder"))
         async def handle_cancel(message: types.Message):
             response = await self.reminder_dispatcher.dispatch(
-                user_id=message.from_user.id, text=message.text or ""
+                user_id=message.from_user.id,  # type: ignore
+                text=message.text or "",
             )
             await message.answer(response)
 
         @self.router.message(Command("reminders"))
         async def handle_list(message: types.Message):
             response = await self.reminder_dispatcher.dispatch(
-                user_id=message.from_user.id, text=message.text or ""
+                user_id=message.from_user.id,  # type: ignore
+                text=message.text or "",
             )
             await message.answer(response)
 
         @self.router.message()
         async def handle_unknown(message: types.Message):
             response = await self.reminder_dispatcher.dispatch(
-                user_id=message.from_user.id, text=message.text or ""
+                user_id=message.from_user.id,  # type: ignore
+                text=message.text or "",
             )
             await message.answer(response)
 
