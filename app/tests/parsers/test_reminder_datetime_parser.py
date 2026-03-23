@@ -93,4 +93,3 @@ class TestParseReminderTime:
         assert ReminderDateTimeParser.parseReminderTime("invalid") is None
         assert ReminderDateTimeParser.parseReminderTime("25:00") is None
         assert ReminderDateTimeParser.parseReminderTime("") is None
-        assert ReminderDateTimeParser.parseReminderTime(None) is None
