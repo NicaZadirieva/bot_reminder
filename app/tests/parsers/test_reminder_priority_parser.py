@@ -2,10 +2,10 @@ import pytest
 
 
 # ============ ИМПОРТЫ ============
-from app.application.utils.parsers.reminder_priority_parser import (
+from app.utils.parsers.reminder_priority_parser import (
     ReminderPriorityParser,
 )
-from app.application.domain.entities import PriorityEntity
+from app.entities import PriorityEntity
 
 # ============ ТЕСТЫ parseReminderPriority ============
 

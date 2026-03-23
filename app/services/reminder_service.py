@@ -1,14 +1,11 @@
 ﻿# Business logics
 from app.utils.mappers import from_entity_to_model, from_model_to_entity
-from app.repositories.reminder_repository import ReminderRepository
+from app.repositories import ReminderRepository
 from typing import Optional, List
 
-from app.entities.entities import ReminderEntity
-from app.models.models import (
-    Reminder as ReminderDb,
-    RepeatedValue as RepeatedValueDb,
-    Status as StatusDb,
-)
+from app.entities import ReminderEntity
+from app.models import ReminderDb, RepeatedValueDb, StatusDb
+
 
 from app.utils.TimeUtils import TimeUtils
 import logging

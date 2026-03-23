@@ -1,11 +1,7 @@
-from app.application.utils.translators.TranslatorMixin import (
-    FromRuTranslatorMixin,
-    FromEngTranslatorMixin,
-)
-from app.application.domain.entities import RepeatedValueEntity
+from app.entities import RepeatedValueEntity
 
 
-class FreqTranslator(FromRuTranslatorMixin, FromEngTranslatorMixin):
+class FreqTranslator:
     @staticmethod
     def from_ru_to_eng(freq: str):
         """

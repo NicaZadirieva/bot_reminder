@@ -1,17 +1,17 @@
 import pytest
-from unittest.mock import AsyncMock, Mock, MagicMock
-
-from sqlalchemy.util.langhelpers import assert_arg_type
-from app.application.services.reminder_service import ReminderService
+from unittest.mock import AsyncMock, MagicMock
 from aiogram import Bot
-from app.application.domain.entities import (
+from datetime import datetime, timezone
+from freezegun import freeze_time
+from functools import partial
+
+from app.services import ReminderScheduler
+from app.services import ReminderService
+from app.entities import (
     ReminderEntity,
     StatusEntity,
     RepeatedValueEntity,
 )
-from datetime import datetime, timezone
-from freezegun import freeze_time
-from functools import partial
 
 
 @pytest.fixture
@@ -33,7 +33,6 @@ def mock_bot():
 
 @pytest.fixture
 def reminder_scheduler(mock_reminder_service: AsyncMock, mock_bot: AsyncMock):
-    from app.application.services.reminder_scheduler import ReminderScheduler
 
     scheduler = ReminderScheduler(mock_reminder_service, mock_bot)
     # Можно замокать scheduler внутри, чтобы не запускать реальные задачи

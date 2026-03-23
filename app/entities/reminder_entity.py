@@ -1,33 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
-from enum import Enum
 
-
-class PriorityEntity(Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-
-
-class StatusEntity(Enum):
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    CANCELLED = "cancelled"
-
-
-class RepeatedValueEntity(Enum):
-    ONCE = "once"
-    DAILY = "daily"
-    WEEKLY = "weekly"
-    MONTHLY = "monthly"
-    YEARLY = "yearly"
-
-
-class PlatformEntity(Enum):
-    VK = "VK"
-    TELEGRAM = "TELEGRAM"
-    MAX = "MAX"
+from .priority_entity import PriorityEntity
+from .status_entity import StatusEntity
+from .repeated_value_entity import RepeatedValueEntity
+from .platform_entity import PlatformEntity
 
 
 @dataclass

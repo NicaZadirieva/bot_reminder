@@ -1,8 +1,7 @@
-from app.application.domain.entities import StatusEntity
-from app.application.utils.translators.TranslatorMixin import FromEngTranslatorMixin
+from app.entities import StatusEntity
 
 
-class StatusTranslator(FromEngTranslatorMixin):
+class StatusTranslator:
     @staticmethod
     def from_eng_to_ru(status: StatusEntity):
         status_str = status.value

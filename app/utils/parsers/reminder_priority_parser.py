@@ -1,6 +1,6 @@
 from typing import Optional
-from app.application.domain.entities import PriorityEntity
-from app.application.utils.translators.TranslatorMixin import (
+from app.entities import PriorityEntity
+from app.utils.translators.TranslatorMixin import (
     FromRuTranslatorMixin,
 )
 

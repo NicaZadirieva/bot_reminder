@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Generic, TypeVar
-from app.models.models import Platform as PlatformDb
+from app.models import PlatformDb
 from dataclasses import dataclass
 
 T = TypeVar("T")

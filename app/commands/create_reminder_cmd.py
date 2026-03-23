@@ -1,7 +1,6 @@
 ﻿from .base import CommandUseCase
-from app.application.services.reminder_service import ReminderService
-from ..utils.parsers import ReminderParser
-from app.application.services.reminder_scheduler import ReminderScheduler
+from app.services import ReminderService, ReminderScheduler
+from app.utils.parsers import ReminderParser
 import logging
 
 logger = logging.getLogger(__name__)

@@ -1,4 +1,4 @@
-from app.application.domain.entities import RepeatedValueEntity
+from app.entities import RepeatedValueEntity
 
 
 class ReminderFrequencyParser:

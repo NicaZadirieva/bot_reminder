@@ -1,22 +1,16 @@
 ﻿import asyncio
 from aiogram import Bot as AiogramBot
-from pytz import timezone
-from app.entities.entities import PlatformEntity
-from app.utils.LoggerUtils import LoggerUtils
-from app.utils.parsers.reminder_parser import ReminderParser
-from app.adapters.aiogram_bot import AiogramBotAdapter
-from app.core import settings
-from app.core.db import async_session
-from app.adapters.vk_bot import VkBotAdapter
-from app.commands.dispatchers.remind_dispatcher import ReminderDispatcher
-from app.controllers.telegram.telegram_bot_controller import TelegramBotController
-from app.repositories.reminder_repository import ReminderRepository
-from app.services.reminder_service import ReminderService
-from app.models.models import Platform as PlatformDb
-from app.services.reminder_scheduler import ReminderScheduler
 
-from app.controllers.vk.vk_bot_controller import VkBotController
-from app.controllers.vk.vk_client import VKClient
+from app.entities import PlatformEntity
+from app.utils.LoggerUtils import LoggerUtils
+from app.utils.parsers import ReminderParser
+from app.adapters import AiogramBotAdapter, VkBotAdapter
+from app.core import settings, async_session
+from app.commands import ReminderDispatcher
+from app.controllers import TelegramBotController, VkBotController, VKClient
+from app.repositories import ReminderRepository
+from app.services import ReminderService, ReminderScheduler
+from app.models import PlatformDb
 
 
 async def run_tg_bot():
@@ -26,9 +20,7 @@ async def run_tg_bot():
         aiogram_bot = AiogramBot(token=settings.tg_app.TG_BOT_TOKEN)  # type: ignore
         bot_adapter = AiogramBotAdapter(aiogram_bot)
         reminder_parser = ReminderParser(PlatformEntity.TELEGRAM)
-        reminder_scheduler = ReminderScheduler(
-            reminder_service, bot_adapter, timezone(settings.common_app.TIMEZONE)
-        )
+        reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
         reminder_dispatcher = ReminderDispatcher(
             reminder_service, reminder_scheduler, reminder_parser
         )
@@ -51,9 +43,7 @@ async def run_vk_bot():
         bot_adapter = VkBotAdapter(vk_client)
 
         reminder_parser = ReminderParser(PlatformEntity.VK)
-        reminder_scheduler = ReminderScheduler(
-            reminder_service, bot_adapter, timezone(settings.common_app.TIMEZONE)
-        )
+        reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
         reminder_dispatcher = ReminderDispatcher(
             reminder_service, reminder_scheduler, reminder_parser
         )

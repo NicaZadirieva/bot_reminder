@@ -1,5 +1,5 @@
-from app.core.bot import Bot
-from app.controllers.vk.vk_client import VKClient
+from app.core import Bot
+from app.controllers import VKClient
 
 
 class VkBotAdapter(Bot):

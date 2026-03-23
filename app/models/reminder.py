@@ -1,36 +1,12 @@
 from datetime import datetime
-from enum import Enum as PyEnum
-
 from sqlalchemy import String, Integer, DateTime, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
-
-
-class Priority(PyEnum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-
-
-class Status(PyEnum):
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    CANCELLED = "cancelled"
-
-
-class RepeatedValue(PyEnum):
-    ONCE = "ONCE"
-    DAILY = "DAILY"
-    WEEKLY = "WEEKLY"
-    MONTHLY = "MONTHLY"
-    YEARLY = "YEARLY"
-
-
-class Platform(PyEnum):
-    VK = "VK"
-    TELEGRAM = "TELEGRAM"
-    MAX = "MAX"
+from .base import Base
+from .priority import Priority
+from .repeated_value import RepeatedValue
+from .status import Status
+from .platform import Platform
 
 
 class Reminder(Base):

@@ -6,12 +6,12 @@
 Полный набор unit и интеграционных тестов для парсера напоминаний
 """
 
-from app.application.domain.entities import (
+from app.entities import (
     PriorityEntity,
     StatusEntity,
     RepeatedValueEntity,
 )
-from app.application.utils.parsers import ReminderParser
+from app.utils.parsers import ReminderParser
 import pytest
 
 # ============ ИНТЕГРАЦИОННЫЕ ТЕСТЫ ============

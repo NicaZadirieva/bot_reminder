@@ -1,5 +1,5 @@
 from aiogram import Bot as AiogramBot
-from app.core.bot import Bot
+from app.core import Bot
 
 
 class AiogramBotAdapter(Bot):

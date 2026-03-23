@@ -1,23 +1,24 @@
-﻿from app.utils.TimeUtils import TimeUtils
-from app.entities.entities import ReminderEntity, RepeatedValueEntity
-from app.core.bot import Bot
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+﻿from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 import logging
 from functools import partial
 
-from app.services.reminder_service import ReminderService
-
+from app.services import ReminderService
+from app.utils.TimeUtils import TimeUtils
+from app.entities import ReminderEntity, RepeatedValueEntity
+from app.core import Bot, settings
 
 logger = logging.getLogger(__name__)
 
 
 class ReminderScheduler:
-    def __init__(self, reminderService: ReminderService, bot: Bot, timezone: timezone):
+    def __init__(self, reminderService: ReminderService, bot: Bot):
         self.reminderService = reminderService
         self.bot = bot
         self.reminders = dict()
-        self.scheduler = AsyncIOScheduler(timezone=timezone)
+        self.scheduler = AsyncIOScheduler(
+            timezone=timezone(settings.common_app.TIMEZONE)
+        )
 
     async def load_reminders(self):
         """📥 Загрузить ВСЕ активные напоминания из БД"""

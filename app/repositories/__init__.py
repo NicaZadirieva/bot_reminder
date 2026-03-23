@@ -1,4 +1,4 @@
-from .postgres_repository import PostgresRepository
 from .reminder_repository import ReminderRepository
+from .repository_interface import IRepository
 
-__all__ = ["PostgresRepository", "ReminderRepository"]
+__all__ = ["ReminderRepository", "IRepository"]

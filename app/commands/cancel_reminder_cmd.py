@@ -1,6 +1,8 @@
-﻿from .base import CommandUseCase
-from app.application.services.reminder_service import ReminderService
-from app.application.services.reminder_scheduler import ReminderScheduler
+﻿import logging
+from .base import CommandUseCase
+from app.services import ReminderService, ReminderScheduler
+
+logger = logging.getLogger(__name__)
 
 
 class CancelReminderCommand(CommandUseCase):
@@ -45,9 +47,12 @@ class CancelReminderCommand(CommandUseCase):
         # Если в базе отменили успешно, пробуем удалить задачу из планировщика
         try:
             await self.reminder_scheduler.cancel_reminder_job(reminder_id, user_id)
-        except Exception as e:
-            # TODO: Логируем ошибку (можно добавить logger в конструктор)
-            # Здесь просто возвращаем предупреждение, но считаем операцию выполненной
+        except Exception:
+            logger.error(
+                "Напоминание #{reminder_id} отменено, но возникла проблема при удалении из планировщика. Обратитесь в поддержку, если напоминание продолжит приходить.",
+                exc_info=True,
+            )
+
             return f"✅ Напоминание #{reminder_id} отменено, но возникла проблема при удалении из планировщика. Обратитесь в поддержку, если напоминание продолжит приходить."
 
         return f"✅ Напоминание #{reminder_id} отменено"

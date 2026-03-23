@@ -1,7 +1,4 @@
-from app.application.utils.translators.TranslatorMixin import FromRuTranslatorMixin
-
-
-class PriorityTranslator(FromRuTranslatorMixin):
+class PriorityTranslator:
     @staticmethod
     def from_ru_to_eng(priority: str):
         """
