@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class PlatformEntity(Enum):
+class Platform(Enum):
     VK = "VK"
     TELEGRAM = "TELEGRAM"
     MAX = "MAX"

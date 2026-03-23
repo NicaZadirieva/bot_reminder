@@ -1,7 +1,7 @@
 import pytest
 
 from app.utils.parsers.reminder_freq_parser import ReminderFrequencyParser
-from app.entities import RepeatedValueEntity
+from app.models import RepeatedValue
 # ============ ТЕСТЫ parseReminderFrequency ============
 
 
@@ -12,22 +12,21 @@ class TestParseReminderFrequency:
     def test_parse_frequency_once(self):
         """'once'"""
         assert (
-            ReminderFrequencyParser.parseReminderFrequency("once")
-            == RepeatedValueEntity.ONCE
+            ReminderFrequencyParser.parseReminderFrequency("once") == RepeatedValue.ONCE
         )
 
     def test_parse_frequency_daily(self):
         """'daily'"""
         assert (
             ReminderFrequencyParser.parseReminderFrequency("daily")
-            == RepeatedValueEntity.DAILY
+            == RepeatedValue.DAILY
         )
 
     def test_parse_frequency_weekly(self):
         """'weekly'"""
         assert (
             ReminderFrequencyParser.parseReminderFrequency("weekly")
-            == RepeatedValueEntity.WEEKLY
+            == RepeatedValue.WEEKLY
         )
 
     # ✅ РАЗНЫЕ РЕГИСТРЫ
@@ -35,14 +34,14 @@ class TestParseReminderFrequency:
         """Частота в верхнем регистре"""
         assert (
             ReminderFrequencyParser.parseReminderFrequency("DAILY")
-            == RepeatedValueEntity.DAILY
+            == RepeatedValue.DAILY
         )
 
     def test_parse_frequency_with_spaces(self):
         """Частота с пробелами"""
         assert (
             ReminderFrequencyParser.parseReminderFrequency("  daily  ")
-            == RepeatedValueEntity.DAILY
+            == RepeatedValue.DAILY
         )
 
     # ❌ НЕВАЛИДНЫЕ ВХОДЫ

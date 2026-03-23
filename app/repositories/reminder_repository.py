@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.models import ReminderDb, PlatformDb
+from app.entities import ReminderDb, PlatformDb
 from sqlalchemy.ext.asyncio import AsyncSession
 from .repository_interface import IRepository
 

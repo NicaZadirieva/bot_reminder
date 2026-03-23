@@ -1,27 +1,31 @@
+from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy import String, Integer, DateTime, Enum
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import Optional
 
-from .base import Base
 from .priority import Priority
-from .repeated_value import RepeatedValue
 from .status import Status
+from .repeated_value import RepeatedValue
 from .platform import Platform
 
 
-class Reminder(Base):
-    __tablename__ = "reminders"
+@dataclass
+class Reminder:
+    user_id: int
+    text: str
+    remind_at: datetime
+    platform: Platform
+    id: Optional[int] = None
+    priority: Priority = Priority.MEDIUM
+    status: Status = Status.ACTIVE
+    created_at: Optional[datetime] = None
+    repeated_value: RepeatedValue = RepeatedValue.ONCE
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer)
-    text: Mapped[str] = mapped_column(String(200), nullable=False)
-    remind_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    priority: Mapped[Priority] = mapped_column(Enum(Priority), default=Priority.MEDIUM)
-    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.ACTIVE)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
-    repeated_value: Mapped[RepeatedValue] = mapped_column(
-        Enum(RepeatedValue, name="repeated_value_enum"),
-        nullable=False,
-        default=RepeatedValue.ONCE,
-    )
-    platform: Mapped[Platform] = mapped_column(Enum(Platform), nullable=False)
+    def __post_init__(self):
+        if self.created_at is None:
+            self.created_at = datetime.now()
+
+    def is_active(self) -> bool:
+        return self.status == Status.ACTIVE
+
+    def mark_completed(self):
+        self.status = Status.COMPLETED

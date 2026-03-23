@@ -1,4 +1,4 @@
-from app.entities import RepeatedValueEntity
+from app.models import RepeatedValue
 
 
 class FreqTranslator:
@@ -28,7 +28,7 @@ class FreqTranslator:
         return freq
 
     @staticmethod
-    def eng_to_ru(repeated_value: RepeatedValueEntity):
+    def eng_to_ru(repeated_value: RepeatedValue):
         repeated_value_str = repeated_value.value
         if repeated_value_str == "daily":
             return "ЕЖЕДНЕВНО"

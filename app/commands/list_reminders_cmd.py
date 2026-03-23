@@ -1,6 +1,6 @@
 ﻿from typing import List
 
-from app.entities import ReminderEntity
+from app.models import Reminder
 from app.services import ReminderService
 from app.utils.translators.StatusTranslator import StatusTranslator
 from app.utils.translators.FreqTranslator import FreqTranslator
@@ -16,7 +16,7 @@ class ListRemindersCommand(CommandUseCase):
     def __init__(self, reminder_service: ReminderService):
         self.reminder_service = reminder_service
 
-    async def _format_reminders(self, reminders: List[ReminderEntity]) -> str:
+    async def _format_reminders(self, reminders: List[Reminder]) -> str:
         """
         Формирует текст из списка напоминаний.
         Если список пуст, возвращает сообщение об этом.

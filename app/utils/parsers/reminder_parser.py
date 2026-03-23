@@ -1,9 +1,9 @@
-﻿from app.entities import (
-    PlatformEntity,
-    ReminderEntity,
-    PriorityEntity,
-    RepeatedValueEntity,
-    StatusEntity,
+﻿from app.models import (
+    Platform,
+    Reminder,
+    Priority,
+    RepeatedValue,
+    Status,
 )
 
 from app.utils.parsers.reminder_datetime_parser import (
@@ -23,7 +23,7 @@ from app.utils.translators.FreqTranslator import FreqTranslator
 # Parser income data
 # TODO: исправить ворнинги
 class ReminderParser:
-    def __init__(self, platform: PlatformEntity):
+    def __init__(self, platform: Platform):
         self.platform = platform
 
     def parse(self, reminderText: str, user_id: int):
@@ -40,13 +40,13 @@ class ReminderParser:
                 if not time:
                     raise ValueError(f"Invalid time format: '{reminderParams[1]}'")
 
-                return ReminderEntity(
+                return Reminder(
                     user_id=user_id,
                     text=desc,
                     remind_at=time,
-                    priority=PriorityEntity.MEDIUM,
-                    status=StatusEntity.ACTIVE,
-                    repeated_value=RepeatedValueEntity.ONCE,
+                    priority=Priority.MEDIUM,
+                    status=Status.ACTIVE,
+                    repeated_value=RepeatedValue.ONCE,
                     platform=self.platform,
                 )
             case 3:
@@ -70,23 +70,23 @@ class ReminderParser:
 
                     if not frequency:
                         raise ValueError(f"Invalid frequency: '{reminderParams[2]}'")
-                    return ReminderEntity(
+                    return Reminder(
                         user_id=user_id,
                         text=desc,
                         remind_at=time,
-                        priority=PriorityEntity.MEDIUM,
-                        status=StatusEntity.ACTIVE,
+                        priority=Priority.MEDIUM,
+                        status=Status.ACTIVE,
                         repeated_value=frequency,
                         platform=self.platform,
                     )
                 else:
-                    return ReminderEntity(
+                    return Reminder(
                         user_id=user_id,
                         text=desc,
                         remind_at=time,
                         priority=priority,
-                        status=StatusEntity.ACTIVE,
-                        repeated_value=RepeatedValueEntity.ONCE,
+                        status=Status.ACTIVE,
+                        repeated_value=RepeatedValue.ONCE,
                         platform=self.platform,
                     )
             case 4:
@@ -109,12 +109,12 @@ class ReminderParser:
                 if not frequency:
                     raise ValueError(f"Invalid frequency: '{reminderParams[3]}'")
 
-                return ReminderEntity(
+                return Reminder(
                     user_id=user_id,
                     text=desc,
                     remind_at=time,
                     priority=priority,
-                    status=StatusEntity.ACTIVE,
+                    status=Status.ACTIVE,
                     repeated_value=frequency,
                     platform=self.platform,
                 )

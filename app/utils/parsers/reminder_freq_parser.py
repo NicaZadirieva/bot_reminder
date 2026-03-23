@@ -1,4 +1,4 @@
-from app.entities import RepeatedValueEntity
+from app.models import RepeatedValue
 
 
 class ReminderFrequencyParser:
@@ -10,7 +10,7 @@ class ReminderFrequencyParser:
         normalized = freq.strip().lower()
 
         try:
-            freq_enum = RepeatedValueEntity(normalized)
+            freq_enum = RepeatedValue(normalized)
             return freq_enum
         except ValueError:
             return None

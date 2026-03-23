@@ -1,5 +1,5 @@
-from app.entities import ReminderEntity
-from app.models import (
+from app.models import Reminder
+from app.entities import (
     ReminderDb,
     RepeatedValueDb,
     StatusDb,
@@ -8,7 +8,7 @@ from app.models import (
 )
 
 
-def from_entity_to_model(entity: ReminderEntity) -> ReminderDb:
+def from_entity_to_model(entity: Reminder) -> ReminderDb:
     return ReminderDb(
         id=entity.id,
         user_id=entity.user_id,

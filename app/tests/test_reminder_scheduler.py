@@ -7,10 +7,10 @@ from functools import partial
 
 from app.services import ReminderScheduler
 from app.services import ReminderService
-from app.entities import (
-    ReminderEntity,
-    StatusEntity,
-    RepeatedValueEntity,
+from app.models import (
+    Reminder,
+    Status,
+    RepeatedValue,
 )
 
 
@@ -43,61 +43,61 @@ def reminder_scheduler(mock_reminder_service: AsyncMock, mock_bot: AsyncMock):
 
 @pytest.fixture
 def sample_reminder_once():
-    return ReminderEntity(
+    return Reminder(
         id=1,
         telegram_id=123,
         text="Test reminder",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
-        repeated_value=RepeatedValueEntity.ONCE,
-        status=StatusEntity.ACTIVE,
+        repeated_value=RepeatedValue.ONCE,
+        status=Status.ACTIVE,
     )
 
 
 @pytest.fixture
 def sample_reminder_daily():
-    return ReminderEntity(
+    return Reminder(
         id=1,
         telegram_id=1234,
         text="Test reminder daily",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
-        repeated_value=RepeatedValueEntity.DAILY,
-        status=StatusEntity.ACTIVE,
+        repeated_value=RepeatedValue.DAILY,
+        status=Status.ACTIVE,
     )
 
 
 @pytest.fixture
 def sample_reminder_yearly():
-    return ReminderEntity(
+    return Reminder(
         id=1,
         telegram_id=12345,
         text="Test reminder yearly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
-        repeated_value=RepeatedValueEntity.YEARLY,
-        status=StatusEntity.ACTIVE,
+        repeated_value=RepeatedValue.YEARLY,
+        status=Status.ACTIVE,
     )
 
 
 @pytest.fixture
 def sample_reminder_monthly():
-    return ReminderEntity(
+    return Reminder(
         id=1,
         telegram_id=123456,
         text="Test reminder monthly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
-        repeated_value=RepeatedValueEntity.MONTHLY,
-        status=StatusEntity.ACTIVE,
+        repeated_value=RepeatedValue.MONTHLY,
+        status=Status.ACTIVE,
     )
 
 
 @pytest.fixture
 def sample_reminder_weekly():
-    return ReminderEntity(
+    return Reminder(
         id=1,
         telegram_id=123456,
         text="Test reminder weekly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
-        repeated_value=RepeatedValueEntity.WEEKLY,
-        status=StatusEntity.ACTIVE,
+        repeated_value=RepeatedValue.WEEKLY,
+        status=Status.ACTIVE,
     )
 
 

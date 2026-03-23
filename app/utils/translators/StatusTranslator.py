@@ -1,9 +1,9 @@
-from app.entities import StatusEntity
+from app.models import Status
 
 
 class StatusTranslator:
     @staticmethod
-    def from_eng_to_ru(status: StatusEntity):
+    def from_eng_to_ru(status: Status):
         status_str = status.value
         if status_str == "active":
             return "АКТИВНЫЙ"

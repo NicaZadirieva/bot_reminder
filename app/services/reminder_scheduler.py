@@ -5,7 +5,7 @@ from functools import partial
 
 from .reminder_service import ReminderService
 from app.utils.TimeUtils import TimeUtils
-from app.entities import ReminderEntity, RepeatedValueEntity
+from app.models import Reminder, RepeatedValue
 from app.core import Bot, settings
 
 logger = logging.getLogger(__name__)
@@ -48,22 +48,22 @@ class ReminderScheduler:
             self.scheduler.shutdown()
             logger.info("✅ Scheduler остановлен")
 
-    async def schedule_reminder(self, reminder: ReminderEntity):
+    async def schedule_reminder(self, reminder: Reminder):
         """Запланировать одно напоминание в APScheduler"""
         try:
-            if reminder.repeated_value == RepeatedValueEntity.ONCE:
+            if reminder.repeated_value == RepeatedValue.ONCE:
                 self.__create_once_task__(reminder)
 
-            elif reminder.repeated_value == RepeatedValueEntity.DAILY:
+            elif reminder.repeated_value == RepeatedValue.DAILY:
                 self.__create_daily_task__(reminder)
 
-            elif reminder.repeated_value == RepeatedValueEntity.WEEKLY:
+            elif reminder.repeated_value == RepeatedValue.WEEKLY:
                 self.__create_weekly_task__(reminder)
 
-            elif reminder.repeated_value == RepeatedValueEntity.MONTHLY:
+            elif reminder.repeated_value == RepeatedValue.MONTHLY:
                 self.__create_monthly_task__(reminder)
 
-            elif reminder.repeated_value == RepeatedValueEntity.YEARLY:
+            elif reminder.repeated_value == RepeatedValue.YEARLY:
                 self.__create_yearly_task__(reminder)
 
         except Exception as e:
@@ -72,7 +72,7 @@ class ReminderScheduler:
                 exc_info=True,
             )
 
-    async def __send_reminder__(self, reminder: ReminderEntity):
+    async def __send_reminder__(self, reminder: Reminder):
         """Эта функция вызовется в reminder.remind_at или по cron"""
         try:
             if not self.bot:
@@ -90,7 +90,7 @@ class ReminderScheduler:
 
             # ⚠️ ВАЖНО: менять статус ТОЛЬКО для ONCE
             # Для DAILY/WEEKLY/MONTHLY оставляем ACTIVE
-            if reminder.repeated_value == RepeatedValueEntity.ONCE:
+            if reminder.repeated_value == RepeatedValue.ONCE:
                 await self.reminderService.cancel_reminder_by_id(
                     reminder.id,  # type: ignore
                     user_id=None,
@@ -104,7 +104,7 @@ class ReminderScheduler:
                 f"❌ Ошибка при отправке напоминания #{reminder.id}: {e}", exc_info=True
             )
 
-    def __create_once_task__(self, reminder: ReminderEntity):
+    def __create_once_task__(self, reminder: Reminder):
         # РАЗОВОЕ НАПОМИНАНИЕ (ONCE)
         # Конвертировать в timezone-aware
         remind_at_aware = TimeUtils._make_aware(reminder.remind_at)
@@ -131,7 +131,7 @@ class ReminderScheduler:
             f"   ✅ #{reminder.id}: {reminder.text} → {remind_at_aware.strftime('%Y-%m-%d %H:%M')}"
         )
 
-    def __create_daily_task__(self, reminder: ReminderEntity):
+    def __create_daily_task__(self, reminder: Reminder):
         # Создать уникальный ID для этой задачи
         job_id = f"reminder_{reminder.id}"
         # ЕЖЕДНЕВНОЕ НАПОМИНАНИЕ (DAILY)
@@ -148,7 +148,7 @@ class ReminderScheduler:
             f"   ♻️ ЕЖЕДНЕВНО: #{reminder.id}: {reminder.text} → каждый день в {reminder.remind_at.strftime('%H:%M')}"
         )
 
-    def __create_weekly_task__(self, reminder: ReminderEntity):
+    def __create_weekly_task__(self, reminder: Reminder):
         # ЕЖЕНЕДЕЛЬНОЕ НАПОМИНАНИЕ (WEEKLY)
         # weekday: 0=Mon, 1=Tue, ..., 6=Sun
         # Создать уникальный ID для этой задачи
@@ -167,7 +167,7 @@ class ReminderScheduler:
             f"   🔁 ЕЖЕНЕДЕЛЬНО: #{reminder.id}: {reminder.text} → каждый {reminder.remind_at.strftime('%A')} в {reminder.remind_at.strftime('%H:%M')}"
         )
 
-    def __create_monthly_task__(self, reminder: ReminderEntity):
+    def __create_monthly_task__(self, reminder: Reminder):
         # ЕЖЕМЕСЯЧНОЕ НАПОМИНАНИЕ (MONTHLY)
         # ⚠️ Проблема: если день > 28, то февраль не сработает
         # Решение: использовать 'last_day_of_month' или обработать исключение
@@ -196,7 +196,7 @@ class ReminderScheduler:
             f"   🗓️ ЕЖЕМЕСЯЧНО: #{reminder.id}: {reminder.text} → каждый месяц, {day}-го в {reminder.remind_at.strftime('%H:%M')}"
         )
 
-    def __create_yearly_task__(self, reminder: ReminderEntity):
+    def __create_yearly_task__(self, reminder: Reminder):
         # ЕЖЕГОДНОЕ НАПОМИНАНИЕ (YEARLY)
         month = reminder.remind_at.month
         day = reminder.remind_at.day

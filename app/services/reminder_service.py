@@ -3,8 +3,8 @@ from app.utils.mappers import from_entity_to_model, from_model_to_entity
 from app.repositories import ReminderRepository
 from typing import Optional, List
 
-from app.entities import ReminderEntity
-from app.models import ReminderDb, RepeatedValueDb, StatusDb
+from app.models import Reminder
+from app.entities import ReminderDb, RepeatedValueDb, StatusDb
 
 
 from app.utils.TimeUtils import TimeUtils
@@ -26,14 +26,14 @@ class ReminderService:
 
     def __filter_reminders_by_user__(
         self, reminders: List[ReminderDb], user_id: int
-    ) -> List[ReminderEntity]:
+    ) -> List[Reminder]:
         return [from_model_to_entity(r) for r in reminders if r.user_id == user_id]
 
-    async def get_all_reminders(self, user_id: int) -> List[ReminderEntity]:
+    async def get_all_reminders(self, user_id: int) -> List[Reminder]:
         all_reminders = await self.reminderRepo.get_all()
         return self.__filter_reminders_by_user__(all_reminders, user_id)
 
-    async def get_all_active_reminders(self) -> List[ReminderEntity]:
+    async def get_all_active_reminders(self) -> List[Reminder]:
         # 1️ Получить ВСЕ напоминания
         all_reminders = await self.reminderRepo.get_all()
 
@@ -52,7 +52,7 @@ class ReminderService:
 
     async def cancel_reminder_by_id(
         self, id: int, user_id: Optional[int]
-    ) -> ReminderEntity | None:
+    ) -> Reminder | None:
         if user_id is None:
             reminderDb = await self.reminderRepo.update(id, status=StatusDb.CANCELLED)
             if reminderDb is not None:
@@ -72,6 +72,6 @@ class ReminderService:
             else:
                 return None
 
-    async def create_reminder(self, reminder: ReminderEntity) -> ReminderEntity:
+    async def create_reminder(self, reminder: Reminder) -> Reminder:
         reminderDb = await self.reminderRepo.create(from_entity_to_model(reminder))
         return from_model_to_entity(reminderDb)

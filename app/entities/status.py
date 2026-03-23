@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class StatusEntity(Enum):
+class Status(Enum):
     ACTIVE = "active"
     COMPLETED = "completed"
     CANCELLED = "cancelled"

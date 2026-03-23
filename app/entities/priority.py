@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class PriorityEntity(Enum):
+class Priority(Enum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"

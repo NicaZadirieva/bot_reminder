@@ -1,7 +1,13 @@
-from .platform import Platform as PlatformDb
-from .priority import Priority as PriorityDb
-from .reminder import Reminder as ReminderDb
-from .repeated_value import RepeatedValue as RepeatedValueDb
-from .status import Status as StatusDb
+from .platform import Platform
+from .priority import Priority
+from .reminder import Reminder
+from .repeated_value import RepeatedValue
+from .status import Status
 
-__all__ = ["PlatformDb", "PriorityDb", "ReminderDb", "RepeatedValueDb", "StatusDb"]
+__all__ = [
+    "Platform",
+    "Priority",
+    "Reminder",
+    "RepeatedValue",
+    "Status",
+]

@@ -1,17 +1,17 @@
 from typing import Optional
-from app.entities import PriorityEntity
+from app.models import Priority
 
 
 class ReminderPriorityParser:
     @staticmethod
-    def parseReminderPriority(priority: str) -> Optional[PriorityEntity]:
+    def parseReminderPriority(priority: str) -> Optional[Priority]:
         if not priority or not isinstance(priority, str):
             return None
 
         normalized = priority.strip().lower()
 
         try:
-            priority_enum = PriorityEntity(normalized)
+            priority_enum = Priority(normalized)
             return priority_enum
         except ValueError:
             return None
