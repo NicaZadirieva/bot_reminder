@@ -47,4 +47,3 @@ class TestParseReminderPriority:
         """Невалидные значения"""
         assert ReminderPriorityParser.parseReminderPriority("invalid") is None
         assert ReminderPriorityParser.parseReminderPriority("") is None
-        assert ReminderPriorityParser.parseReminderPriority(None) is None

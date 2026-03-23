@@ -320,10 +320,10 @@ just format
 ### Запуск тестов
 
 ```bash
-pytest
+uv run pytest
 
 # Для запуска конкретного теста:
-pytest tests/test_parser.py::test_parse_time
+uv run pytest tests/test_parser.py::test_parse_time
 ```
 
 ## 📊 Логирование

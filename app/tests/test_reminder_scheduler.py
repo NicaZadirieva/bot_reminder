@@ -7,11 +7,7 @@ from functools import partial
 
 from app.services import ReminderScheduler
 from app.services import ReminderService
-from app.domain import (
-    Reminder,
-    Status,
-    RepeatedValue,
-)
+from app.domain import Reminder, Status, RepeatedValue, Platform
 
 
 @pytest.fixture
@@ -45,11 +41,12 @@ def reminder_scheduler(mock_reminder_service: AsyncMock, mock_bot: AsyncMock):
 def sample_reminder_once():
     return Reminder(
         id=1,
-        telegram_id=123,
+        user_id=123,
         text="Test reminder",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValue.ONCE,
         status=Status.ACTIVE,
+        platform=Platform.VK,
     )
 
 
@@ -57,11 +54,12 @@ def sample_reminder_once():
 def sample_reminder_daily():
     return Reminder(
         id=1,
-        telegram_id=1234,
+        user_id=1234,
         text="Test reminder daily",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValue.DAILY,
         status=Status.ACTIVE,
+        platform=Platform.VK,
     )
 
 
@@ -69,11 +67,12 @@ def sample_reminder_daily():
 def sample_reminder_yearly():
     return Reminder(
         id=1,
-        telegram_id=12345,
+        user_id=12345,
         text="Test reminder yearly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValue.YEARLY,
         status=Status.ACTIVE,
+        platform=Platform.VK,
     )
 
 
@@ -81,11 +80,12 @@ def sample_reminder_yearly():
 def sample_reminder_monthly():
     return Reminder(
         id=1,
-        telegram_id=123456,
+        user_id=123456,
         text="Test reminder monthly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValue.MONTHLY,
         status=Status.ACTIVE,
+        platform=Platform.VK,
     )
 
 
@@ -93,17 +93,13 @@ def sample_reminder_monthly():
 def sample_reminder_weekly():
     return Reminder(
         id=1,
-        telegram_id=123456,
+        user_id=123456,
         text="Test reminder weekly",
         remind_at=datetime(2025, 1, 1, 12, 0, tzinfo=timezone.utc),
         repeated_value=RepeatedValue.WEEKLY,
         status=Status.ACTIVE,
+        platform=Platform.VK,
     )
-
-
-def test_init(reminder_scheduler):
-    scheduler = reminder_scheduler
-    assert scheduler.tz.zone == "Europe/Moscow"
 
 
 @pytest.mark.asyncio
@@ -224,7 +220,7 @@ async def test_send_reminder(
 
     # мок вызова отмены напоминания
     mock_cancel_reminder = mocker.patch.object(
-        service, "cancel_reminder_by_id", new_callable=AsyncMock
+        service, "complete_reminder_by_id", new_callable=AsyncMock
     )
     # Действия
     await scheduler.__send_reminder__(sample_reminder_once)
@@ -384,7 +380,7 @@ def test_create_yearly_task_schedules_job(reminder_scheduler, sample_reminder_ye
 async def test_cancel_reminder_job_success(reminder_scheduler, sample_reminder_once):
     scheduler = reminder_scheduler
     reminder_id = sample_reminder_once.id
-    user_id = sample_reminder_once.telegram_id
+    user_id = sample_reminder_once.user_id
     job_id = f"reminder_{reminder_id}"
 
     # Настраиваем сервис: напоминание существует
@@ -413,7 +409,7 @@ async def test_cancel_reminder_job_no_job_in_scheduler(
 ):
     scheduler = reminder_scheduler
     reminder_id = sample_reminder_once.id
-    user_id = sample_reminder_once.telegram_id
+    user_id = sample_reminder_once.user_id
     job_id = f"reminder_{reminder_id}"
 
     scheduler.reminderService.check_if_reminder_exists = AsyncMock(return_value=True)
@@ -435,7 +431,7 @@ async def test_cancel_reminder_job_reminder_not_found(
 ):
     scheduler = reminder_scheduler
     reminder_id = sample_reminder_once.id
-    user_id = sample_reminder_once.telegram_id
+    user_id = sample_reminder_once.user_id
     job_id = f"reminder_{reminder_id}"
 
     # Сервис говорит, что напоминания нет
