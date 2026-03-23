@@ -55,6 +55,7 @@
 - **Python 3.13+**
 - **PostgreSQL 12+**
 - **Telegram Bot Token**
+- **VK Bot Token, VK Group Id**
 
 ### Зависимости
 
