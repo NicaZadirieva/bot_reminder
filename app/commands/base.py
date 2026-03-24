@@ -13,3 +13,7 @@ class CommandUseCase(ABC):
         :return: результат (текст ответа, клавиатура и т.п.)
         """
         pass
+
+    @abstractmethod
+    def get_detailed_help(self) -> str:
+        pass

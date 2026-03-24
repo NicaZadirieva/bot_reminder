@@ -16,6 +16,9 @@ class ListRemindersCommand(CommandUseCase):
     def __init__(self, reminder_service: ReminderService):
         self.reminder_service = reminder_service
 
+    def get_detailed_help(self) -> str:
+        return "/reminders - просмотр всех напоминаний"
+
     async def _format_reminders(self, reminders: List[Reminder]) -> str:
         """
         Формирует текст из списка напоминаний.

@@ -7,6 +7,11 @@ class HelpCommand(CommandUseCase):
     Не требует аргументов, просто возвращает текст справки.
     """
 
+    def get_detailed_help(self) -> str:
+        return "\n".join(
+            ["/help [имя команды]", "Примеры /help:", "/help /remind", "/help"]
+        )
+
     async def execute(self, user_id: int, args=None, **kwargs) -> str:
         """
         Возвращает текст помощи.
@@ -25,6 +30,8 @@ class HelpCommand(CommandUseCase):
                 "    /remind Рабочая встреча | 09:00 | HIGH | daily",
                 "    /remind Купить подарок | 2024-11-20 19:00 | MEDIUM | once\n",
                 "/reminders Показать все ваши напоминания\n",
-                "/cancel_reminder <ID> Отменить напоминание по ID",
+                "/cancel_reminder <ID> Отменить напоминание по ID\n",
+                "/help [имя команды] - Справочная информация по команде\n",
+                "/start - Начало работы с ботом",
             ]
         )
