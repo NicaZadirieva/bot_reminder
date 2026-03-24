@@ -6,7 +6,7 @@ from app.utils.LoggerUtils import LoggerUtils
 from app.utils.parsers import ReminderParser
 from app.adapters import AiogramBotAdapter, VkBotAdapter
 from app.core import settings, async_session
-from app.commands import ReminderDispatcher
+from app.dispatchers import CommandDispatcher
 from app.controllers import TelegramBotController, VkBotController, VKClient
 from app.repositories import ReminderRepository
 from app.services import ReminderService, ReminderScheduler
@@ -21,7 +21,7 @@ async def run_tg_bot():
         bot_adapter = AiogramBotAdapter(aiogram_bot)
         reminder_parser = ReminderParser(Platform.TELEGRAM)
         reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
-        reminder_dispatcher = ReminderDispatcher(
+        reminder_dispatcher = CommandDispatcher(
             reminder_service, reminder_scheduler, reminder_parser
         )
 
@@ -44,7 +44,7 @@ async def run_vk_bot():
 
         reminder_parser = ReminderParser(Platform.VK)
         reminder_scheduler = ReminderScheduler(reminder_service, bot_adapter)
-        reminder_dispatcher = ReminderDispatcher(
+        reminder_dispatcher = CommandDispatcher(
             reminder_service, reminder_scheduler, reminder_parser
         )
 

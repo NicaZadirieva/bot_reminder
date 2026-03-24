@@ -3,9 +3,10 @@ from app.commands.cancel_reminder_cmd import CancelReminderCommand
 from app.commands.list_reminders_cmd import ListRemindersCommand
 from app.commands.start_cmd import StartCommand
 from app.commands.help_cmd import HelpCommand
+from .base import BaseCommandDispatcher
 
 
-class ReminderDispatcher:
+class CommandDispatcher(BaseCommandDispatcher):
     """
     Диспетчер команд для работы с напоминаниями.
     Принимает на вход ID пользователя и текст сообщения,
@@ -27,13 +28,6 @@ class ReminderDispatcher:
         }
 
     async def dispatch(self, user_id: int, text: str) -> str:
-        """
-        Маршрутизирует сообщение к нужной команде.
-
-        :param user_id: ID пользователя (из Telegram / VK / и т.д.)
-        :param text: полный текст сообщения (например, "/remind купить молоко | 18:00")
-        :return: текст ответа для отправки пользователю
-        """
         if not text or not text.strip():
             return "Пустое сообщение."
 
