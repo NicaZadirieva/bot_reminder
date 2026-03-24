@@ -6,6 +6,9 @@ class StartCommand(CommandUseCase):
     Use case для приветственного сообщения и краткой справки.
     """
 
+    def get_detailed_help(self) -> str:
+        return "/start - Начать работу"
+
     async def execute(self, user_id: int, args=None, **kwargs) -> str:
         return "\n".join(
             [

@@ -17,6 +17,17 @@ class CancelReminderCommand(CommandUseCase):
         self.reminder_service = reminder_service
         self.reminder_scheduler = reminder_scheduler
 
+    def get_detailed_help(self) -> str:
+        return "\n".join(
+            [
+                "/cancel_reminder [ID напоминания] - отменяет напоминание",
+                "Примеры /cancel_reminder:",
+                "/cancel_reminder 123",
+                "\n",
+                "ID напоминания должен быть целым числом",
+            ]
+        )
+
     async def execute(self, user_id: int, args=None, **kwargs) -> str:
         """
         Выполняет отмену напоминания.
