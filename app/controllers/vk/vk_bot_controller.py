@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Dict, Any
 
-from app.commands import ReminderDispatcher
+from app.dispatchers import BaseCommandDispatcher
 from app.services import ReminderScheduler
 from .vk_client import VKClient
 
@@ -13,7 +13,7 @@ class VkBotController:
     def __init__(
         self,
         vk_client: VKClient,
-        reminder_dispatcher: ReminderDispatcher,
+        reminder_dispatcher: BaseCommandDispatcher,
         reminder_scheduler: ReminderScheduler,
     ):
         self.client = vk_client

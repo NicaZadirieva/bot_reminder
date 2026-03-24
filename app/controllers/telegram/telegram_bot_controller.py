@@ -2,7 +2,7 @@ import logging
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
 
-from app.commands import ReminderDispatcher
+from app.dispatchers import BaseCommandDispatcher
 from app.services import ReminderScheduler
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class TelegramBotController:
     def __init__(
         self,
         aiogram_bot: Bot,
-        reminder_dispatcher: ReminderDispatcher,
+        reminder_dispatcher: BaseCommandDispatcher,
         reminder_scheduler: ReminderScheduler,
     ):
         self.bot = aiogram_bot
